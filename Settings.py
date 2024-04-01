@@ -3,50 +3,79 @@ import cv2
 from pypylon import pylon
 from pypylon_opencv_viewer import BaslerOpenCVViewer
 
-from Params import *
+import Params as P
 
 
 # --- Defs
 # <<< Program
-def setWindows():
-	cv2.namedWindow(WINDOW_CAM)
-	cv2.namedWindow(WINDOW_PARAMS)
-
-	cv2.resizeWindow(WINDOW_PARAMS, 400, 600)
-
-def exit(isExternal, camera):
+def exit(isExternal, camera, program):
 	if isExternal:
-		camera.Close()
+		closeExternalCam(camera)
 	else:
-		camera.release()
+		closeInternalCam(camera)
 
+	program.quit()
 	cv2.destroyAllWindows()
-
 	cv2.waitKey(10)
 
-	print("Program has been closed")
+	print("\n\nProgram has been closed")
 
 
 # <<< Camera
 def getCamBySerial():
+	global cameraMode
+
 	for i in pylon.TlFactory.GetInstance().EnumerateDevices():
-		if i.GetSerialNumber() == serialNumber:
-			return i
+		if i.GetSerialNumber() == P.serialNumber:
+			cameraMode = 1
+
+			camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateDevice(P.isExternal))
+			camera.Open()
+
+			setCamSize(camera)
+
+			camera.StartGrabbing(1)
+
+			return i, camera
 	else:
-		print(f"There is no camera with {serialNumber} serial number")
-		return None
+		cameraMode = 0
+
+		camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+
+		setCamSize(camera)
+
+		return None, camera
+
+def setCamSize(camera):
+	if P.isExternal:
+		if P.isTextShown:
+			camera.Width.SetValue( int(P.cameraWidth * P.coefficient) )
+			camera.Height.SetValue( int(P.cameraHeight * P.coefficient) )
+		else:
+			camera.Width.SetValue( P.cameraWidth )
+			camera.Height.SetValue( P.cameraHeight )
+
+	else:
+		if P.isTextShown:
+			camera.set( cv2.CAP_PROP_FRAME_WIDTH, int(P.cameraWidth * P.coefficient) )
+			camera.set( cv2.CAP_PROP_FRAME_HEIGHT, int(P.cameraHeight * P.coefficient) )
+
+		else:
+			camera.set( cv2.CAP_PROP_FRAME_WIDTH, P.cameraWidth )
+			camera.set( cv2.CAP_PROP_FRAME_HEIGHT, P.cameraHeight )
 
 def getImageExternalCam(camera):
 	grab = camera.RetrieveResult(2000, pylon.TimeoutHandling_Return)
-	if grab.GrabSucceeded():
-	    frame = grab.GetArray()
 
-	    return frame
-	return None
+	return grab.GetArray() if grab.GrabSucceeded() else None
+
+def closeExternalCam(camera):
+	camera.Close()
 
 def getImageInteranlCam(camera):
 	ret, frame = camera.read()
 
-	if ret:
-		return frame
-	return None
+	return frame if ret else None
+
+def closeInternalCam(camera):
+	camera.release()

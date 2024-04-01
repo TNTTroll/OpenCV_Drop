@@ -1,18 +1,30 @@
 # --- Imports
-import cv2
-
-from Params import *
+import pygame as pg
 
 
 # --- Defs
 # <<< Frames
-def putText(frame, text, pos, color=(10, 10, 10), fontScale=1):
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    org = (pos[0], pos[1])
-    thickness = 2
-    outline = [(255 - x) for x in color]
+def putText(screen, text, pos, color=(240, 240, 240), size=40):
+    font = pg.font.SysFont(None, size)
+    showText = font.render(str(text), True, color)
+    screen.blit(showText, (pos[0], pos[1]))
 
-    cv2.putText(frame, str(text), org, font,
-                fontScale, outline, thickness + 2, cv2.LINE_AA)
-    cv2.putText(frame, str(text), org, font,
-                fontScale, color, thickness, cv2.LINE_AA)
+
+def convertForPygame(cvFrame):
+    cvImage = cvFrame[:, :].tobytes()
+    cvShape = cvFrame.shape[1::-1]
+
+    try:
+        image = pg.image.frombuffer(cvImage, cvShape, 'BGR')
+
+        return image
+
+    except(IndexError, ValueError):
+        image = pg.image.frombuffer(cvImage, cvShape, 'P')
+
+        return image
+
+# --- Links
+'''
+PyGame Image Convert: https://pg1.readthedocs.io/en/latest/ref/image.html#pygame.image.frombuffer
+'''

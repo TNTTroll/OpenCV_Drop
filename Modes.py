@@ -1,46 +1,48 @@
 # --- Imports
 import cv2
 from math import sqrt
+import numpy as np
 
-from Params import *
+import Params as P
 import Additional as A
 
 
+screen = None
+
 # --- Defs
-def getFrame(frame, statisticFrame, mode, isTextShown):
-    global cellPX, pxSizeframe
+def getFrame(frame, scr, sliders, mode):
+    global screen
+    screen = scr
 
-    if (isTextShown):
-        A.putText(frame, f"< {mode[0]} >", (10, 25))
+    if P.isTextShown:
+        A.putText(screen, f"< {mode[0]} >", (P.statOffsetX, P.statOffsetY))
 
-    A.putText(statisticFrame, f"PX between dots: {round(cellPX, 3)}", (statOffsetX, statOffsetY * 1))
-    A.putText(statisticFrame, f"PX Size (MM): {round(pxSizeframe, 4)}", (statOffsetX, statOffsetY * 2))
+        A.putText(screen, f"PX between dots: {round(P.cellPX, 3)}", (P.statOffsetX, P.statOffsetY * 2))
+        A.putText(screen, f"PX Size (MM): {round(P.pxSizeframe, 4)}", (P.statOffsetX, P.statOffsetY * 3))
+
+    if P.checkForFlip:
+        frame = cv2.flip(frame, 1)
 
     if (mode[0] == "SETTINGS" or mode[1] == "SETTINGS"):
-        return modeSettings(frame, mode)
+        return modeSettings(frame, sliders, mode)
 
     if (mode[0] == "CHECKBOARD"):
-        frame, cellPX, pxSizeframe = modeChessboard(frame, statisticFrame)
-
-        return frame
+        return modeChessboard(frame, sliders, mode)
 
     if (mode[0] == "DETECTING"):
-        frame = modeDetecting(frame)
-
-        return frame
+        return modeDetecting(frame)
 
     else:  # Default
         return frame
 
 
 def setFrame(frame, way):
-    frame = frame[par06:(HEIGHT - par07 + 1), par08:(WIDTH - par09 + 1)]
+    frame = frame[P.sets[6]:(P.HEIGHT - P.sets[7] + 1), P.sets[8]:(P.WIDTH - P.sets[9] + 1)]
 
-    if (way == "CUT"):
-        return frame
+    if (way == "CUT"): return frame
 
     else:
-        mask = cv2.inRange(frame, (par00, par01, par02), (par03, par04, par05))
+        mask = cv2.inRange(frame, (P.sets[0], P.sets[1], P.sets[2]), (P.sets[3], P.sets[4], P.sets[5]))
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel=np.ones((4, 4)), iterations=1)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel=np.ones((4, 4)), iterations=4)
 
@@ -59,99 +61,77 @@ def setFrame(frame, way):
 
             cv2.rectangle(frame, (l, t), (l + w, t + h), (255, 0, 255), 1)
 
-            A.putText(frame, pxSizeframe * w, (l, t))
+            #A.putText(screen, P.pxSizeframe * w, (l, t))
 
         return frame
 
 
-def modeSettings(frame, mode):
-    global par00, par01, par02, par03, par04, par05, par06, par07, par08, par09
+def modeSettings(frame, sliders, mode):
 
-    if (mode[0] != mode[1]):
+    if (mode[0] != mode[1]): # Toggle first frame
         if (mode[0] == "SETTINGS"):
-            cv2.namedWindow(WINDOW_SET)
-
-            cv2.createTrackbar('Par00', WINDOW_SET, par00, 255, change_value)
-            cv2.createTrackbar('Par01', WINDOW_SET, par01, 255, change_value)
-            cv2.createTrackbar('Par02', WINDOW_SET, par02, 255, change_value)
-            cv2.createTrackbar('Par03', WINDOW_SET, par03, 255, change_value)
-            cv2.createTrackbar('Par04', WINDOW_SET, par04, 255, change_value)
-            cv2.createTrackbar('Par05', WINDOW_SET, par05, 255, change_value)
-            cv2.createTrackbar('Par06', WINDOW_SET, par06, HEIGHT - 1, change_value)
-            cv2.createTrackbar('Par07', WINDOW_SET, par07, HEIGHT - 1, change_value)
-            cv2.createTrackbar('Par08', WINDOW_SET, par08, WIDTH - 1, change_value)
-            cv2.createTrackbar('Par09', WINDOW_SET, par09, WIDTH - 1, change_value)
+            for x in range( len(sliders) ):
+                sliders[x].set_current_value(P.sets[x])
+                sliders[x].show()
 
         else:
-            cv2.destroyWindow(WINDOW_SET)
+            for slider in sliders: slider.hide()
 
     else:
-        settings = winSettings.copy()
-
-        par00 = cv2.getTrackbarPos('Par00', WINDOW_SET)
-        par01 = cv2.getTrackbarPos('Par01', WINDOW_SET)
-        par02 = cv2.getTrackbarPos('Par02', WINDOW_SET)
-        par03 = cv2.getTrackbarPos('Par03', WINDOW_SET)
-        par04 = cv2.getTrackbarPos('Par04', WINDOW_SET)
-        par05 = cv2.getTrackbarPos('Par05', WINDOW_SET)
-        par06 = cv2.getTrackbarPos('Par06', WINDOW_SET)
-        par07 = cv2.getTrackbarPos('Par07', WINDOW_SET)
-        par08 = cv2.getTrackbarPos('Par08', WINDOW_SET)
-        par09 = cv2.getTrackbarPos('Par09', WINDOW_SET)
-
-        cv2.putText(settings, "PRESS 'S' to SAVE", (0, 10), cv2.FONT_HERSHEY_SIMPLEX, 1, BLACK, 2, cv2.LINE_AA)
-
-        cv2.imshow(WINDOW_SET, settings)
+        for x in range( len(P.sets) ):
+            P.sets[x] = sliders[x].get_current_value()
 
         frame = setFrame(frame, "FULL")
 
     return frame
 
 
-def modeChessboard(frame, statisticFrame):
-    global cellPX, pxSizeframe
-
+def modeChessboard(frame, sliders, mode):
     frame = setFrame(frame, "CUT")
 
-    nline = 4
-    ncol = 5
+    if (mode[0] != mode[1]):  # Toggle first frame
+        if (mode[0] == "CHECKBOARD"):
+            for x in range(2):
+                sliders[x].set_current_value(P.checkField[x])
+                sliders[x].show()
 
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+        else:
+            for x in range(2): sliders[x].show()
 
-    if (isExternal == None):
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    else:
+        nline = sliders[0].get_current_value()
+        ncol = sliders[1].get_current_value()
 
-    ret, cornersChess = cv2.findChessboardCorners(frame, (nline, ncol), None)
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
-    if (ret):
-        putDots = cv2.cornerSubPix(frame, cornersChess, (11, 11), (-1, -1), criteria)
+        if P.isExternal == None:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        for coord in putDots:
-            x = int(coord[0][0])
-            y = int(coord[0][1])
+        ret, cornersChess = cv2.findChessboardCorners(frame, (nline, ncol), None)
 
-            cv2.circle(frame, (x, y), 1, (255, 255, 255), 2)
+        if ret:
+            putDots = cv2.cornerSubPix(frame, cornersChess, (11, 11), (-1, -1), criteria)
 
-            distanceX = abs(putDots[0][0][0] - putDots[1][0][0])
-            distanceY = abs(putDots[0][0][1] - putDots[1][0][1])
+            for coord in putDots:
+                x, y = int(coord[0][0]), int(coord[0][1])
 
-            cellPX = sqrt((distanceX * distanceX) + (distanceY * distanceY))
+                cv2.circle(frame, (x, y), 1, (255, 255, 255), 2)
 
-            cv2.line(frame, (int(putDots[0][0][0]), int(putDots[0][0][1])),
-                     (int(putDots[1][0][0]), int(putDots[1][0][1])), (255, 255, 255), 2)
+                distanceX = abs(putDots[0][0][0] - putDots[1][0][0])
+                distanceY = abs(putDots[0][0][1] - putDots[1][0][1])
 
-            chessWidthPX = cellPX * (ncol + 1)
-            chessHeightPX = cellPX * (nline + 1)
+                cellPX = sqrt((distanceX * distanceX) + (distanceY * distanceY))
 
-            pxSizeframe = realSize / chessWidthPX
+                cv2.line(frame, (int(putDots[0][0][0]), int(putDots[0][0][1])),
+                                (int(putDots[1][0][0]), int(putDots[1][0][1])),
+                                (255, 255, 255), 2)
 
-            stats = [cellPX, pxSizeframe]
+                chessWidthPX = cellPX * (ncol + 1)
 
-    return frame, cellPX, pxSizeframe
+                P.pxSizeframe = P.realSize / chessWidthPX
+
+    return frame
 
 
 def modeDetecting(frame):
     return setFrame(frame, "FULL")
-
-
-def change_value(value): pass

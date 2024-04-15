@@ -32,6 +32,10 @@ def setScreen():
     P.buttons[2] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH * .75, P.HEIGHT//2-25), (150, 50)),
                                                 text="Stop", manager=P.manager, visible=False)
 
+    # Set a median
+    P.buttons[3] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH * .75, P.HEIGHT // 2 + 50), (150, 50)),
+                                                text="Background", manager=P.manager, visible=False)
+
 
 def exit(camera, program):
     closeExternalCam(camera) if P.isExternal else closeInternalCam(camera)
@@ -97,8 +101,10 @@ def setCamSize(camera, type):
 def getImageExternalCam(camera):
     grab = camera.RetrieveResult(2000, pylon.TimeoutHandling_Return)
 
-    return grab.GetArray() if grab.GrabSucceeded() else None
-
+    if grab != None:
+        if grab.GrabSucceeded():
+            return grab.GetArray()
+    return None
 def closeExternalCam(camera):
     camera.Close()
 
@@ -106,6 +112,5 @@ def getImageInteranlCam(camera):
     ret, frame = camera.read()
 
     return frame if ret else None
-
 def closeInternalCam(camera):
     camera.release()

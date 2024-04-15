@@ -1,5 +1,7 @@
 # --- Imports
 import cv2
+import time
+import os
 from math import sqrt
 import numpy as np
 
@@ -10,8 +12,7 @@ import Additional as A
 # --- Defs
 def getFrame(frame, mode):
 
-    if P.checkForFlip:
-        frame = cv2.flip(frame, 1)
+    if P.isFlip: frame = cv2.flip(frame, 1)
 
     # For the first frame hide old things and show current
     if (mode[0] != mode[1]):
@@ -23,7 +24,7 @@ def getFrame(frame, mode):
         P.screen.blit(A.convertForPygame(frame), (0, 0))
 
         if P.isRecording:
-            P.out.write(frame)
+            P.out.write(cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR))
 
     except(cv2.error, TypeError, AttributeError):
         A.putTextPy("| NO SIGNAL |", (P.WIDTH // 4, P.HEIGHT // 2))
@@ -35,6 +36,9 @@ def getFrame(frame, mode):
 
         if P.buttons[1].visible:
             P.buttons[1].hide()
+
+        if P.buttons[3].visible:
+            P.buttons[3].hide()
 
         setTextMode(mode[0])
 
@@ -49,7 +53,7 @@ def getFrame(frame, mode):
             setModeChoise(mode[0], False)
 
         if P.isRecording:
-            A.putTextPy("Recording...", (P.WIDTH * .75, P.HEIGHT//2+60))
+            A.putTextPy("Recording...", (P.WIDTH * .75, P.HEIGHT//3-60))
 
             if not P.buttons[2].visible:
                 P.buttons[2].show()
@@ -64,52 +68,65 @@ def getFrame(frame, mode):
             if P.buttons[2].visible:
                 P.buttons[2].hide()
 
+        if not P.buttons[3].visible:
+            P.buttons[3].show()
 
-def setFrame(frame, way):
-    if (way == "CUT"): return frame
+def setFrame(frame):
+    copy = frame.copy()
+    copy = copy[P.sets[6]:int(P.HEIGHT - P.sets[7] + 1), P.sets[8]:int(frame.shape[1] - P.sets[9] + 1)]
 
+    if len(frame.shape) > 2:
+        mask = cv2.inRange(copy, (P.sets[0], P.sets[1], P.sets[2]), (P.sets[3], P.sets[4], P.sets[5]))
     else:
-        copy = frame.copy()
-        copy = copy[P.sets[6]:int(P.HEIGHT - P.sets[7] + 1), P.sets[8]:int(frame.shape[1] - P.sets[9] + 1)]
+        mask = cv2.inRange(copy, (P.sets[0]), (P.sets[1]))
 
-        if P.isExternal == None:
-            mask = cv2.inRange(copy, (P.sets[0], P.sets[1], P.sets[2]), (P.sets[3], P.sets[4], P.sets[5]))
-        else:
-            mask = cv2.inRange(copy, (P.sets[0]), (P.sets[1]))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel=np.ones((4, 4)), iterations=1)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel=np.ones((4, 4)), iterations=4)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_ERODE, kernel=np.ones((5, 5)))
 
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel=np.ones((4, 4)), iterations=1)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel=np.ones((4, 4)), iterations=4)
+    copy = cv2.bitwise_and(copy, copy, mask=mask)
 
-        copy = cv2.bitwise_and(copy, copy, mask=cv2.morphologyEx(mask, cv2.MORPH_ERODE, kernel=np.ones((5, 5))))
+    frame[P.sets[6]:int(P.HEIGHT - P.sets[7] + 1), P.sets[8]:int(frame.shape[1] - P.sets[9]) + 1] = copy
 
-        frame[P.sets[6]:int(P.HEIGHT - P.sets[7] + 1), P.sets[8]:int(frame.shape[1] - P.sets[9]) + 1] = copy
+    frame, _ = getConnected(frame, mask)
 
-        cv2.rectangle(frame, (P.sets[8], P.sets[6]),
-                      (int(frame.shape[1]-P.sets[9]), int(frame.shape[0]-P.sets[7])),
-                      (0, 255, 0), 3)
+    return frame
 
-        output = cv2.connectedComponentsWithStats(mask, 4, cv2.CV_32S)
-        num_labels = output[0]
-        stats = output[2]
+def getConnected(frame, mask):
+    cv2.rectangle(frame, (P.sets[8], P.sets[6]),
+                  (int(frame.shape[1] - P.sets[9]), int(frame.shape[0] - P.sets[7])),
+                  (0, 255, 0), 3)
 
-        for i in range(num_labels):
-            t = P.sets[6]
-            l = P.sets[8]
-            w = stats[i, cv2.CC_STAT_WIDTH]
-            h = stats[i, cv2.CC_STAT_HEIGHT]
+    output = cv2.connectedComponentsWithStats(mask, 4, cv2.CV_32S)
+    num_labels = output[0]
+    stats = output[2]
 
-            if (w*h < P.sets[10]):
-                cv2.rectangle(frame, (l, t), (w + l, h + t), (255, 0, 255), 1)
-                if P.pxSizeframe != 0: A.putTextCv(frame, round((P.pxSizeframe * h), 3), (l + w//2, t + h), size=.5)
+    for i in range(1, num_labels):
+        t = P.sets[6] + stats[i, cv2.CC_STAT_TOP]
+        l = P.sets[8] + stats[i, cv2.CC_STAT_LEFT]
+        w = stats[i, cv2.CC_STAT_WIDTH]
+        h = stats[i, cv2.CC_STAT_HEIGHT]
 
-        return frame
+        if (w * h > P.sets[10] and t != 2147483647):
+            cv2.rectangle(frame, (l, t), (w + l, h + t), (255, 0, 255), 1)
+
+            if P.pxSizeframe != 0:
+                textWidth = f"{round((P.pxSizeframe * w), 3)}mm"
+                textHeight = f"{round((P.pxSizeframe * h), 3)}mm"
+            else:
+                textWidth = f"{w}px"
+                textHeight = f"{h}px"
+
+            A.putTextCv(frame, textWidth, (l + w // 2, t + h - 5), size=.5)
+            A.putTextCv(frame, textHeight, (l + 5, t + h // 2), size=.5)
+
+    return frame, num_labels
 
 def setModeChoise(name, set):
+    if not set: cv2.destroyAllWindows()
     return globals()['setMode' + str(name[0] + name.lower()[1:])](set)
-
 def modeChoise(name, frame):
     return globals()['mode' + str(name[0] + name.lower()[1:])](frame)
-
 def setTextMode(name):
     return globals()['setText' + str(name[0] + name.lower()[1:])]()
 
@@ -118,7 +135,6 @@ def setModeDefault(set):
     pass
 def modeDefault(frame):
     return frame
-
 def setTextDefault():
     pass
 
@@ -135,14 +151,12 @@ def setModeSettings(set):
 
     else:
         for slider in P.sliders: slider.hide()
-
 def modeSettings(frame):
 
     for x in range( len(P.sets) ):
         P.sets[x] = P.sliders[x].get_current_value()
 
-    return setFrame(frame, "FULL")
-
+    return setFrame(frame)
 def setTextSettings():
     for x in range(len(P.slidersSettingsNames)):
         A.putTextPy(P.slidersSettingsNames[x], (P.WIDTH - 280, 75 + (25 * x)), size=20)
@@ -156,10 +170,7 @@ def setModeChess(set):
 
     else:
         for x in range(2): P.sliders[x].hide()
-
 def modeChess(frame):
-    frame = setFrame(frame, "CUT")
-
     nline = P.sliders[0].get_current_value()
     ncol = P.sliders[1].get_current_value()
 
@@ -192,7 +203,169 @@ def modeChess(frame):
             P.pxSizeframe = P.realSize / chessWidthPX
 
     return frame
-
 def setTextChess():
     for x in range(len(P.slidersCheckboardMode)):
         A.putTextPy(P.slidersCheckboardMode[x], (P.WIDTH - 305, 75 + (25 * x)), size=20)
+
+# <<< Different mode
+def setModeDifferent(set):
+    if set:
+        for x in range(2):
+            P.sliders[x].set_current_value(P.sets[x])
+            P.sliders[x].show()
+
+        P.sliders[-1].set_current_value(P.sets[-1])
+        P.sliders[-1].show()
+
+    else:
+        for x in range(2): P.sliders[x].hide()
+        P.sliders[-1].hide()
+def modeDifferent(frame):
+    for x in range(len(P.sets)):
+        P.sets[x] = P.sliders[x].get_current_value()
+
+    if P.isExternal == None:
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    median = cv2.imread(P.medianName, 0)
+    frame = cv2.absdiff(frame, median)
+
+    frame = setFrame(frame)
+
+    return frame
+def setTextDifferent():
+    for x in range(len(P.slidersMovementMode)):
+        A.putTextPy(P.slidersMovementMode[x], (P.WIDTH - 305, 75 + (25 * x)), size=20)
+
+    A.putTextPy(P.slidersSettingsNames[-1], (P.WIDTH - 305, 325), size=20)
+
+# <<< Movement mode
+def setModeMovement(set):
+    if set:
+        for x in range(2):
+            P.sliders[x].set_current_value(P.sets[x])
+            P.sliders[x].show()
+
+        P.sliders[-1].set_current_value(P.sets[-1])
+        P.sliders[-1].show()
+
+    else:
+        for x in range(2): P.sliders[x].hide()
+        P.sliders[-1].hide()
+def modeMovement(frame):
+    for x in range(len(P.sets)):
+        P.sets[x] = P.sliders[x].get_current_value()
+
+    if P.isExternal == None:
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Add new frame to array
+    try:
+        if frame == None: return
+    except(ValueError):
+        P.dynamicFrames.append(frame)
+        if (len(P.dynamicFrames) > P.dynamicLength):
+            P.dynamicFrames.pop(0)
+
+    median = np.median(P.dynamicFrames, axis=0).astype(dtype=np.uint8)
+    frame = cv2.absdiff(frame, median)
+
+    thresh = cv2.threshold(frame, 0, 255, cv2.THRESH_BINARY)[1]
+
+    mask = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel=np.ones((4, 4)), iterations=2)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel=np.ones((4, 4)), iterations=1)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel=np.ones((4, 4)), iterations=7)
+
+    frame = cv2.bitwise_and(frame, frame, mask=mask)
+
+    frame, num = getConnected(frame, mask)
+
+    A.putTextPy(f"Objects: {num}", (P.WIDTH * .75, P.HEIGHT // 2 - 40), size=30)
+
+    if num > 1:
+        P.timeFramesCount += 1
+        if P.timeStart != 0:
+            A.putTextPy(f"Capturing: {round((time.time() - P.timeStart), 2)}s", (P.WIDTH * .75, P.HEIGHT // 2 - 80), size=30)
+
+        if not P.isRecDynamic:
+            P.timeStart = time.time()
+            P.isRecDynamic = True
+
+            P.path = "%s%s.avi"%(P.folder, time.strftime(P.timeFormat, time.gmtime()))
+            A.recording(True)
+    else:
+        if P.timeStart != 0:
+
+            if P.timeFramesCount > 1:
+                A.recording(False)
+
+                if time.time() - P.timeStart < P.timeGap:
+                    os.remove(P.path)
+                    A.putTextPy(f"Deleted. {round((time.time() - P.timeStart), 2)}s", (P.WIDTH * .75, P.HEIGHT // 2), size=30)
+
+            P.timeFramesCount = 0
+            P.isRecDynamic = False
+            P.timeStart = 0
+
+    return frame
+def setTextMovement():
+    for x in range(len(P.slidersMovementMode)):
+        A.putTextPy(P.slidersMovementMode[x], (P.WIDTH - 305, 75 + (25 * x)), size=20)
+
+    A.putTextPy(P.slidersSettingsNames[-1], (P.WIDTH - 305, 325), size=20)
+
+# <<< Playground mode
+def setModePlay(set):
+    if set:
+        for x in range(len(P.sliders)):
+            P.sliders[x].set_current_value(P.sets[x])
+            P.sliders[x].show()
+
+        if P.isExternal:
+            for x in range(2, 6):
+                P.sliders[x].hide()
+
+    else:
+        for slider in P.sliders: slider.hide()
+def haha(frame):
+    output = cv2.connectedComponentsWithStats(frame, 4, cv2.CV_32S)
+    num_labels = output[0]
+    stats = output[2]
+
+    for i in range(num_labels):
+        t = stats[i, cv2.CC_STAT_TOP]
+        l = stats[i, cv2.CC_STAT_LEFT]
+        w = stats[i, cv2.CC_STAT_WIDTH]
+        h = stats[i, cv2.CC_STAT_HEIGHT]
+
+        cv2.rectangle(frame, (l, t), (w + l, h + t), (255, 0, 255), 1)
+
+    return frame
+def modePlay(frame):
+    for x in range( len(P.sets) ):
+        P.sets[x] = P.sliders[x].get_current_value()
+
+    frame = cv2.bilateralFilter(frame, 9, 25, 25)
+
+    sobelx = cv2.Sobel(frame, cv2.CV_64F, 1, 0, ksize=5)
+    sobely = cv2.Sobel(frame, cv2.CV_64F, 0, 1, ksize=5)
+    sobel = sobelx / 2 + sobely / 2
+
+    laplac = cv2.Laplacian(frame, cv2.CV_64F)
+
+    edges = cv2.Canny(frame, P.sets[0], P.sets[1])
+
+    kernel = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
+    if P.isExternal == None:
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        ker = cv2.filter2D(gray, -1, kernel)
+    else:
+        ker = cv2.filter2D(frame, -1, kernel)
+
+    cv2.imshow("SOBEL", setFrame(sobel))
+    cv2.imshow("LAPLACIAN", setFrame(laplac))
+    cv2.imshow("CANNY", haha(edges))
+    cv2.imshow("KERNEL", haha(ker))
+def setTextPlay():
+    for x in range(len(P.slidersSettingsNames)):
+        A.putTextPy(P.slidersSettingsNames[x], (P.WIDTH - 280, 75 + (25 * x)), size=20)

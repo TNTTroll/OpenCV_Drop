@@ -21,6 +21,7 @@ S.setScreen()
 
 
 # --- Camera
+saveFrame = None
 isRunning = True
 while isRunning:
 
@@ -33,9 +34,8 @@ while isRunning:
     else:
         frame = S.getImageInteranlCam(camera)
 
-    # <<< Work with frame
-    M.getFrame(frame, [P.modes[P.currentMode], P.modes[P.lastMode]])
-    P.lastMode = P.currentMode
+    # <<< Get a new median
+    A.getMedian(frame)
 
     # <<< Control Panel
     for event in pg.event.get():
@@ -44,7 +44,7 @@ while isRunning:
                 if not P.isRecording:
                     isRunning = False
                 else:
-                    A.putTextPy("Recording in progress", (P.WIDTH * .75, P.HEIGHT//2-80), size=25)
+                    A.recording(False)
 
             if event.key == pg.K_a:  # Previous mode
                 P.currentMode -= 1
@@ -60,8 +60,11 @@ while isRunning:
                 else:
                     A.putTextPy("Recording in progress", (P.WIDTH * .75, P.HEIGHT//2-80), size=25)
 
-            if event.key == pg.K_SPACE:  # Flip the frame
-                P.checkForFlip = not P.checkForFlip
+            if event.key == pg.K_f:  # Flip the frame
+                P.isFlip = not P.isFlip
+
+            if event.key == pg.K_SPACE:  # Pause the video
+                P.isGoing = not P.isGoing
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == P.buttons[0]:  # Switch camera
@@ -79,19 +82,24 @@ while isRunning:
                     A.putTextPy("No Connection", (P.WIDTH*.75+30, 30), size=20)
 
             if event.ui_element == P.buttons[1]:  # Start recording
-                P.isRecording = True
-                print("\nStart a recording")
-
-                P.out = cv2.VideoWriter(P.path, P.fourcc, P.FPS, (640, 480))
+                A.recording(True)
 
             if event.ui_element == P.buttons[2]:  # Stop recording
-                P.isRecording = False
-                print("\nStop a recording")
+                A.recording(False)
 
-                P.out.release()
+            if event.ui_element == P.buttons[3]:  # Set a background
+                P.medianFrames = []
 
         P.manager.process_events(event)
 
+    if P.isGoing: saveFrame = frame
+    else: A.putTextPy("PAUSE", (P.WIDTH * .8, P.HEIGHT//3-60))
+
+    # <<< Work with frame
+    M.getFrame(saveFrame, [P.modes[P.currentMode], P.modes[P.lastMode]])
+    P.lastMode = P.currentMode
+
+    # <<< Process the window
     clock.tick(P.FPS)
     time_delta = clock.tick(60) / 1000.0
     P.manager.update(time_delta)
@@ -113,7 +121,5 @@ PyGame GUI: https://pygame-gui.readthedocs.io/en/latest/index.html
 
 
 '''
-- Сохранение фона 
-- Вычитание из фона
 - Попробовать фильтр Собеля
 '''

@@ -15,13 +15,15 @@ WIDTH = int(cameraSizeInternal[0] * coefficient)
 HEIGHT = int(cameraSizeInternal[1] * coefficient)
 
 WINDOW_CAM = "Camera" 		# Name for Camera window
-FPS = 30
+FPS = 24
 
 isExternal = None 			# Check if isExternal camera is ON
 cameraMode = 0              # Camera mode [None, Internal, External]
 cameraModeText = ["None", "Internal", "External"]
 
-checkForFlip = False        # Flip the frame horizontally
+isFlip = False        # Flip the frame horizontally
+
+isGoing = True              # Pause the video
 
 # WINDOWS
 serialNumber = '22193655'   # Camera from SkolTech
@@ -32,7 +34,7 @@ winSettings[:, :, :] = 240
 # MODES
 currentMode = lastMode = 0  # Current and previous modes
 
-modes = ["DEFAULT", "SETTINGS", "CHESS"] # Modes for camera
+modes = ["DEFAULT", "SETTINGS", "CHESS", "DIFFERENT", "MOVEMENT", "PLAY"] # Modes for camera
 
 isTextShown = True 			# Show "mode" naming
 
@@ -40,12 +42,17 @@ realSize = 29.8 			# Real size for checkerboard
 
 sliders = []                # Sliders for 'Settings' mode
 buttons = ["Cam Mode",      # Buttons
-           "Record", "Stop"]
+           "Record", "Stop",
+           "Median"]
 
 # RECORD
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-path = r"C:/Users/Spectre/Desktop/Programming/Work/output.avi"
+folder = "folder/"
+path = "_.avi"
+timeFormat = "%d.%m.%y_%H-%M-%S"
 out = None
+
+timeGap = 1.3
 
 isRecording = False         # Check for a recording state
 
@@ -60,6 +67,7 @@ slidersSettingsNames = ["B1", "G1", "R1",  # Names for sliders in 'Settings' mod
                         "W1", "W2",
                         "Sq"]
 slidersCheckboardMode = ["NCol", "NRow"]
+slidersMovementMode = ["Min", "Max"]
 
 sets = [0, 0, 0, 255, 255, 255, 0, 0, 0, 0, WIDTH*HEIGHT//2]
 maxs = [255, 255, 255, 255, 255, 255,
@@ -70,3 +78,15 @@ maxs = [255, 255, 255, 255, 255, 255,
 checkField = [4, 5]
 
 cellPX = pxSizeframe = 0
+
+# DIFFERENT
+medianLength = 50
+medianFrames = [x for x in range(medianLength)]
+
+medianName = "Median_BG.jpg"
+
+# MOVEMENT
+timeStart = timeFramesCount = 0
+isRecDynamic = False
+dynamicLength = 10
+dynamicFrames = []

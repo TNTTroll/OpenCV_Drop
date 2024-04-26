@@ -58,7 +58,7 @@ def convertForPygame(cvFrame):
 
     return image
 
-# <<< Text
+# <<< Recording
 def recording(set):
     P.isRecording = set
     if set:
@@ -68,6 +68,13 @@ def recording(set):
     else:
         print("\nStop a recording")
         P.out.release()
+
+# <<< Reset
+def resetAllParams():
+    print("RESET ALL")
+
+    P.dynamicFrames = []
+    # TODO: Add here all necessaries params that need to clear
 
 # --- Links
 '''

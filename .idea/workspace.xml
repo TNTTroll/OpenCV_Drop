@@ -4,16 +4,38 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ac5af6fb-780d-434c-a0eb-0f07d7c464dc" name="Changes" comment="First PyGame attempt">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_01_04_2024_12_07_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_01_04_2024_12_07__Changes_.xml" beforeDir="false" />
+    <list default="true" id="ac5af6fb-780d-434c-a0eb-0f07d7c464dc" name="Changes" comment="Different + Movement">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Additional.py" beforeDir="false" afterPath="$PROJECT_DIR$/Additional.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Median_BG.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Median_BG.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Modes.py" beforeDir="false" afterPath="$PROJECT_DIR$/Modes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Params.py" beforeDir="false" afterPath="$PROJECT_DIR$/Params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PlayGround.py" beforeDir="false" afterPath="$PROJECT_DIR$/PlayGround.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-36-12.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-36-58.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-37-08.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-37-17.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-37-20.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-37-22.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-37-33.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-37-34.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-37-51.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-37-54.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-38-02.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-38-09.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-38-16.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-38-24.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-38-25.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-38-27.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-38-34.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-38-38.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-38-40.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-38-54.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-39-02.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-39-06.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/folder/15.04.24_15-39-08.avi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output.avi" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +50,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -67,13 +94,15 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;ToolWindowRun.ShowToolbar&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;v3.0&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/Spectre/PycharmProjects/OpenDrop/Main.py&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Spectre\PycharmProjects\OpenDrop" />
+      <recent name="C:\Users\Spectre\PycharmProjects\OpenDrop\.venv" />
       <recent name="C:\Users\Spectre\PycharmProjects\OpenDrop\src" />
     </key>
   </component>
@@ -134,11 +163,31 @@
       <option name="project" value="LOCAL" />
       <updated>1711994009903</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Different + Movement">
+      <option name="closed" value="true" />
+      <created>1713196143031</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1713196143031</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="First PyGame attempt" />
-    <option name="LAST_COMMIT_MESSAGE" value="First PyGame attempt" />
+    <MESSAGE value="Different + Movement" />
+    <option name="LAST_COMMIT_MESSAGE" value="Different + Movement" />
   </component>
 </project>

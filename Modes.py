@@ -26,6 +26,9 @@ def getFrame(frame, mode):
         if P.isRecording:
             P.out.write(cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR))
 
+        if P.lastFrameMode > 0:
+            A.putTextPy(f"Last: {P.lastFrameMode}", (P.WIDTH - 300, 20), size=30)
+
     except(cv2.error, TypeError, AttributeError):
         A.putTextPy("| NO SIGNAL |", (P.WIDTH // 4, P.HEIGHT // 2))
 
@@ -70,6 +73,27 @@ def getFrame(frame, mode):
 
         if not P.buttons[3].visible:
             P.buttons[3].show()
+
+    if P.lastFrameMode > 0:
+        try:
+            if P.lastFrames[-1] == None or P.lastFrames[-1] == 0:
+                pass
+        except(ValueError):
+            for i in range(P.lastFrameMode):
+                P.lastFrames[i] = cv2.resize(P.lastFrames[i], (320, 240), interpolation=cv2.INTER_LINEAR)
+
+            if P.lastFrameMode == 1:
+                layers = P.lastFrames[0]
+            elif P.lastFrameMode == 2:
+                layers = np.hstack((P.lastFrames[1], P.lastFrames[0]))
+            elif P.lastFrameMode == 3:
+                layers = np.hstack((P.lastFrames[2], P.lastFrames[1], P.lastFrames[0]))
+            elif P.lastFrameMode == 4:
+                layers = np.vstack((np.hstack((P.lastFrames[3], P.lastFrames[2])),
+                                    np.hstack((P.lastFrames[1], P.lastFrames[0]))))
+
+            cv2.imshow(P.lastFrameName, layers)
+
 
 def setFrame(frame):
     copy = frame.copy()
@@ -230,7 +254,14 @@ def modeDifferent(frame):
     median = cv2.imread(P.medianName, 0)
     frame = cv2.absdiff(frame, median)
 
-    frame = setFrame(frame)
+    thresh = cv2.threshold(frame, 0, 255, cv2.THRESH_BINARY)[1]
+
+    mask = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel=np.ones((4, 4)), iterations=4)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel=np.ones((4, 4)), iterations=1)
+
+    frame = cv2.bitwise_and(frame, frame, mask=mask)
+
+    frame, _ = getConnected(frame, mask)
 
     return frame
 def setTextDifferent():
@@ -283,6 +314,7 @@ def modeMovement(frame):
     A.putTextPy(f"Objects: {num}", (P.WIDTH * .75, P.HEIGHT // 2 - 40), size=30)
 
     if num > 1:
+
         P.timeFramesCount += 1
         if P.timeStart != 0:
             A.putTextPy(f"Capturing: {round((time.time() - P.timeStart), 2)}s", (P.WIDTH * .75, P.HEIGHT // 2 - 80), size=30)
@@ -314,58 +346,117 @@ def setTextMovement():
 
     A.putTextPy(P.slidersSettingsNames[-1], (P.WIDTH - 305, 325), size=20)
 
-# <<< Playground mode
-def setModePlay(set):
+# <<< Window mode
+def setModeWindow(set):
     if set:
-        for x in range(len(P.sliders)):
+        for x in range(len(P.slidersWindowMode)):
             P.sliders[x].set_current_value(P.sets[x])
             P.sliders[x].show()
 
-        if P.isExternal:
-            for x in range(2, 6):
-                P.sliders[x].hide()
+        P.sliders[-1].set_current_value(P.sets[-1])
+        P.sliders[-1].show()
+
+        P.path = "%s%s.avi" % (P.folder, time.strftime(P.timeFormat, time.gmtime()))
+        P.windowOut = cv2.VideoWriter(P.path, P.fourcc, P.FPS, (640, 480))
 
     else:
         for slider in P.sliders: slider.hide()
-def haha(frame):
-    output = cv2.connectedComponentsWithStats(frame, 4, cv2.CV_32S)
-    num_labels = output[0]
-    stats = output[2]
+        P.sliders[-1].hide()
+        P.windowOut.release()
+def modeWindow(frame):
+    def saveFrames():
+        if P.moveFrame > 5:  # TODO: Change for drop (less frames needed to be)
+            for i in range(len(P.windowStaticArray) - 1):
+                try:
+                    if P.windowStaticArray[P.currentFrame % 50] != 0: pass
+                except(ValueError):
+                    P.windowOut.write(P.windowStaticArray[P.currentFrame % 50])
 
-    for i in range(num_labels):
-        t = stats[i, cv2.CC_STAT_TOP]
-        l = stats[i, cv2.CC_STAT_LEFT]
-        w = stats[i, cv2.CC_STAT_WIDTH]
-        h = stats[i, cv2.CC_STAT_HEIGHT]
+                P.currentFrame += 1
 
-        cv2.rectangle(frame, (l, t), (w + l, h + t), (255, 0, 255), 1)
+            for i in range(P.moveFrame):
+                P.windowOut.write(P.windowMoveArray[i])
 
-    return frame
-def modePlay(frame):
-    for x in range( len(P.sets) ):
+            P.windowOut.release()
+            P.path = "%s%s.avi" % (P.folder, time.strftime(P.timeFormat, time.gmtime()))
+            P.windowOut = cv2.VideoWriter(P.path, P.fourcc, P.FPS, (640, 480))
+
+        P.currentFrame %= 50
+        P.moveFrame = 0
+
+    for x in range(len(P.sets)):
         P.sets[x] = P.sliders[x].get_current_value()
 
-    frame = cv2.bilateralFilter(frame, 9, 25, 25)
-
-    sobelx = cv2.Sobel(frame, cv2.CV_64F, 1, 0, ksize=5)
-    sobely = cv2.Sobel(frame, cv2.CV_64F, 0, 1, ksize=5)
-    sobel = sobelx / 2 + sobely / 2
-
-    laplac = cv2.Laplacian(frame, cv2.CV_64F)
-
-    edges = cv2.Canny(frame, P.sets[0], P.sets[1])
-
-    kernel = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
     if P.isExternal == None:
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        ker = cv2.filter2D(gray, -1, kernel)
-    else:
-        ker = cv2.filter2D(frame, -1, kernel)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    cv2.imshow("SOBEL", setFrame(sobel))
-    cv2.imshow("LAPLACIAN", setFrame(laplac))
-    cv2.imshow("CANNY", haha(edges))
-    cv2.imshow("KERNEL", haha(ker))
+    # Add new frame to array
+    try:
+        if frame == None or frame == 0: return
+    except(ValueError):
+        P.dynamicFrames.append(frame)
+        if len(P.dynamicFrames) > P.dynamicLength:
+            P.dynamicFrames.pop(0)
+
+    median = np.median(P.dynamicFrames, axis=0).astype(dtype=np.uint8)
+    diff = cv2.absdiff(frame, median)
+
+    thresh = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY)[1]
+
+    mask = cv2.erode(thresh, kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(4,4)), iterations=P.sets[0])
+    mask = cv2.dilate(mask, kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(4,4)), iterations=P.sets[1])
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(4,4)), iterations=P.sets[2])
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(4,4)), iterations=P.sets[3])
+
+    diff = cv2.bitwise_and(frame, frame, mask=mask)
+
+    connection, num = getConnected(diff, mask)
+
+    frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+
+    if num > 1:  # There are object on the scene
+        P.windowMoveArray[P.moveFrame] = frame
+        P.moveFrame += 1
+        if P.moveFrame == len(P.windowMoveArray) - 1:
+            saveFrames()
+
+        if P.windowReset == 1:
+            P.windowMax = 0
+
+        P.windowMax = max(P.windowMax, num-1)
+        P.windowReset = 0
+
+        P.windowBuffer = [connection] + P.lastFrames[0:-1]
+
+    else:  # Static scene
+        P.windowStaticArray[P.currentFrame] = frame
+        P.currentFrame += 1
+        if P.currentFrame >= len(P.windowStaticArray) - 1: P.currentFrame = 0
+
+        if P.moveFrame != 0:
+            saveFrames()
+
+        if P.windowReset == 0:
+            P.lastFrames = P.windowBuffer
+
+        P.windowReset = 1
+
+    A.putTextPy(f"Objects: {num - 1}", (P.WIDTH * .75, P.HEIGHT // 2 - 40), size=30)
+    A.putTextPy(f"Max: {P.windowMax}", (P.WIDTH * .75, P.HEIGHT // 2 - 20), size=30)
+
+    A.putTextCv(frame, f"A: {P.currentFrame}", (50, 50))
+    A.putTextCv(frame, f"B: {P.moveFrame}", (50, 100))
+
+    return connection
+def setTextWindow():
+    for x in range(len(P.slidersWindowMode)):
+        A.putTextPy(f"{P.slidersWindowMode[x]}: {P.sets[x]}", (P.WIDTH - 300, 75 + (25 * x)), size=20)
+    A.putTextPy(P.slidersSettingsNames[-1], (P.WIDTH - 305, 325), size=20)
+
+# <<< Playground mode
+def setModePlay(set):
+    pass
+def modePlay(frame):
+    return frame
 def setTextPlay():
-    for x in range(len(P.slidersSettingsNames)):
-        A.putTextPy(P.slidersSettingsNames[x], (P.WIDTH - 280, 75 + (25 * x)), size=20)
+    pass

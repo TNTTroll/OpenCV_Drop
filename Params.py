@@ -34,7 +34,7 @@ winSettings[:, :, :] = 240
 # MODES
 currentMode = lastMode = 0  # Current and previous modes
 
-modes = ["DEFAULT", "SETTINGS", "CHESS", "DIFFERENT", "MOVEMENT", "PLAY"] # Modes for camera
+modes = ["DEFAULT", "SETTINGS", "CHESS", "DIFFERENT", "MOVEMENT", "PLAY", "WINDOW"] # Modes for camera
 
 isTextShown = True 			# Show "mode" naming
 
@@ -44,6 +44,12 @@ sliders = []                # Sliders for 'Settings' mode
 buttons = ["Cam Mode",      # Buttons
            "Record", "Stop",
            "Median"]
+
+lastFrameMode = 0
+lastFrames = []
+lastFrameName = "Last Frames"
+
+windowBuffer = []
 
 # RECORD
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -68,6 +74,7 @@ slidersSettingsNames = ["B1", "G1", "R1",  # Names for sliders in 'Settings' mod
                         "Sq"]
 slidersCheckboardMode = ["NCol", "NRow"]
 slidersMovementMode = ["Min", "Max"]
+slidersWindowMode = ["Ero", "Dil", "Opn", "Cls"]
 
 sets = [0, 0, 0, 255, 255, 255, 0, 0, 0, 0, WIDTH*HEIGHT//2]
 maxs = [255, 255, 255, 255, 255, 255,
@@ -88,5 +95,12 @@ medianName = "Median_BG.jpg"
 # MOVEMENT
 timeStart = timeFramesCount = 0
 isRecDynamic = False
-dynamicLength = 10
+dynamicLength = 3
 dynamicFrames = []
+
+# WINDOW
+windowOut = None
+currentFrame = moveFrame = 0
+windowStaticArray = [0 for x in range(50)]   # For static frames
+windowMoveArray = [0 for x in range(50)]  # For movements on the scene
+windowMax = windowReset = 0

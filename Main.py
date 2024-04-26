@@ -55,16 +55,30 @@ while isRunning:
                 if P.currentMode == len(P.modes): P.currentMode = 0
 
             if event.key == pg.K_TAB:  # Toggle Settings and Recording modes
-                if not P.isRecording:
-                    P.isTextShown = not P.isTextShown
-                else:
-                    A.putTextPy("Recording in progress", (P.WIDTH * .75, P.HEIGHT//2-80), size=25)
+                P.isTextShown = not P.isTextShown
+
+                # TODO: Skip the new recording for windowBuffer
+                #if not P.isRecording:
+                #    P.isTextShown = not P.isTextShown
+                #else:
+                #    A.putTextPy("Recording in progress", (P.WIDTH * .75, P.HEIGHT//2-80), size=25)
 
             if event.key == pg.K_f:  # Flip the frame
                 P.isFlip = not P.isFlip
 
             if event.key == pg.K_SPACE:  # Pause the video
                 P.isGoing = not P.isGoing
+
+            # Control the "Last frame" mode
+            if event.key == pg.K_w:
+                P.lastFrameMode += 1
+            elif event.key == pg.K_s:
+                P.lastFrameMode -= 1
+
+            P.lastFrameMode = min(P.lastFrameMode, 4)
+            P.lastFrameMode = max(P.lastFrameMode, 0)
+
+            P.lastFrames = [0 for x in range(P.lastFrameMode)]
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == P.buttons[0]:  # Switch camera
@@ -80,6 +94,8 @@ while isRunning:
 
                 if previousCam == P.cameraMode:
                     A.putTextPy("No Connection", (P.WIDTH*.75+30, 30), size=20)
+                else:
+                    A.resetAllParams()
 
             if event.ui_element == P.buttons[1]:  # Start recording
                 A.recording(True)
@@ -121,5 +137,5 @@ PyGame GUI: https://pygame-gui.readthedocs.io/en/latest/index.html
 
 
 '''
-- Попробовать фильтр Собеля
+- Попробовать записывать видео с ухудшением качества
 '''

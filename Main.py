@@ -115,6 +115,8 @@ while isRunning:
     M.getFrame(saveFrame, [P.modes[P.currentMode], P.modes[P.lastMode]])
     P.lastMode = P.currentMode
 
+    P.frameCount += 1
+
     # <<< Process the window
     clock.tick(P.FPS)
     time_delta = clock.tick(60) / 1000.0

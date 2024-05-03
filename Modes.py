@@ -7,6 +7,8 @@ import numpy as np
 
 import Params as P
 import Additional as A
+import Logging as L
+from Drop import Drop
 
 
 # --- Defs
@@ -94,7 +96,6 @@ def getFrame(frame, mode):
 
             cv2.imshow(P.lastFrameName, layers)
 
-
 def setFrame(frame):
     copy = frame.copy()
     copy = copy[P.sets[6]:int(P.HEIGHT - P.sets[7] + 1), P.sets[8]:int(frame.shape[1] - P.sets[9] + 1)]
@@ -145,6 +146,41 @@ def getConnected(frame, mask):
             A.putTextCv(frame, textHeight, (l + 5, t + h // 2), size=.5)
 
     return frame, num_labels
+
+def getObjects(frame, mask):
+    cv2.rectangle(frame, (P.sets[8], P.sets[6]),
+                  (int(frame.shape[1] - P.sets[9]), int(frame.shape[0] - P.sets[7])),
+                  (0, 255, 0), 3)
+
+    output = cv2.connectedComponentsWithStats(mask, 4, cv2.CV_32S)
+    num = output[0]
+    stats = output[2]
+
+    drops = []
+
+    for i in range(1, num):
+        t = P.sets[6] + stats[i, cv2.CC_STAT_TOP]
+        l = P.sets[8] + stats[i, cv2.CC_STAT_LEFT]
+        w = stats[i, cv2.CC_STAT_WIDTH]
+        h = stats[i, cv2.CC_STAT_HEIGHT]
+        a = stats[i, cv2.CC_STAT_AREA]
+
+        drops.append( Drop(a, w, h, l, t) )
+
+        if (w * h > P.sets[10] and t != 2147483647):
+            cv2.rectangle(frame, (l, t), (w + l, h + t), (255, 0, 255), 1)
+
+            if P.pxSizeframe != 0:
+                textWidth = f"{round((P.pxSizeframe * w), 3)}mm"
+                textHeight = f"{round((P.pxSizeframe * h), 3)}mm"
+            else:
+                textWidth = f"{w}px"
+                textHeight = f"{h}px"
+
+            A.putTextCv(frame, textWidth, (l + w // 2, t + h - 5), size=.5)
+            A.putTextCv(frame, textHeight, (l + 5, t + h // 2), size=.5)
+
+    return frame, drops
 
 def setModeChoise(name, set):
     if not set: cv2.destroyAllWindows()
@@ -359,10 +395,16 @@ def setModeWindow(set):
         P.path = "%s%s.avi" % (P.folder, time.strftime(P.timeFormat, time.gmtime()))
         P.windowOut = cv2.VideoWriter(P.path, P.fourcc, P.FPS, (640, 480))
 
+        P.logFrame = open(P.logFolder + P.logFrameName, "a+")
+        P.logQueue = open(P.logFolder + P.logQueueName, "a+")
+
     else:
         for slider in P.sliders: slider.hide()
         P.sliders[-1].hide()
         P.windowOut.release()
+
+        P.logFrame.close()
+        P.logQueue.close()
 def modeWindow(frame):
     def saveFrames():
         if P.moveFrame > 5:  # TODO: Change for drop (less frames needed to be)
@@ -410,11 +452,11 @@ def modeWindow(frame):
 
     diff = cv2.bitwise_and(frame, frame, mask=mask)
 
-    connection, num = getConnected(diff, mask)
+    connection, objects = getObjects(diff, mask)
 
     frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
 
-    if num > 1:  # There are object on the scene
+    if len(objects) > 0:  # There are object on the scene
         P.windowMoveArray[P.moveFrame] = frame
         P.moveFrame += 1
         if P.moveFrame == len(P.windowMoveArray) - 1:
@@ -423,29 +465,43 @@ def modeWindow(frame):
         if P.windowReset == 1:
             P.windowMax = 0
 
-        P.windowMax = max(P.windowMax, num-1)
+        P.windowMax = max(P.windowMax, len(objects)-1)
         P.windowReset = 0
 
         P.windowBuffer = [connection] + P.lastFrames[0:-1]
+
+        if len(P.queueDrops) - P.inactiveDrops < len(objects):
+            P.queueDrops.append( Drop(objects[0].areaPX[0], objects[0].width[0],
+                                      objects[0].height[0], objects[0].left[0], objects[0].top[0]) )
+
+        elif len(objects) - P.inactiveDrops > len(objects):
+            P.inactiveDrops += 1
+
+        if len(objects) > 0:
+            for x in range(P.inactiveDrops, len(objects)):
+                objects[x].addParam(objects[x])
 
     else:  # Static scene
         P.windowStaticArray[P.currentFrame] = frame
         P.currentFrame += 1
         if P.currentFrame >= len(P.windowStaticArray) - 1: P.currentFrame = 0
 
+        if P.windowReset == 0:
+            if P.moveFrame != 0: L.queueLog(P.moveFrame)
+            P.lastFrames = P.windowBuffer
+
         if P.moveFrame != 0:
             saveFrames()
 
-        if P.windowReset == 0:
-            P.lastFrames = P.windowBuffer
-
         P.windowReset = 1
 
-    A.putTextPy(f"Objects: {num - 1}", (P.WIDTH * .75, P.HEIGHT // 2 - 40), size=30)
+    A.putTextPy(f"Objects: {len(objects)}", (P.WIDTH * .75, P.HEIGHT // 2 - 40), size=30)
     A.putTextPy(f"Max: {P.windowMax}", (P.WIDTH * .75, P.HEIGHT // 2 - 20), size=30)
 
     A.putTextCv(frame, f"A: {P.currentFrame}", (50, 50))
     A.putTextCv(frame, f"B: {P.moveFrame}", (50, 100))
+
+    if 0 < len(objects) < 10: L.frameLog(objects)
 
     return connection
 def setTextWindow():

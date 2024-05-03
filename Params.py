@@ -25,6 +25,9 @@ isFlip = False        # Flip the frame horizontally
 
 isGoing = True              # Pause the video
 
+frameCount = 0
+threadCount = 0
+
 # WINDOWS
 serialNumber = '22193655'   # Camera from SkolTech
 
@@ -104,3 +107,14 @@ currentFrame = moveFrame = 0
 windowStaticArray = [0 for x in range(50)]   # For static frames
 windowMoveArray = [0 for x in range(50)]  # For movements on the scene
 windowMax = windowReset = 0
+
+# LOGGING
+logFolder = "logging/"
+
+logFrameName = "frames.txt"
+logFrame = None
+
+inactiveDrops = 0
+queueDrops = []
+logQueueName = "queue.txt"
+logQueue = None

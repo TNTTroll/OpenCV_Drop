@@ -1,13 +1,13 @@
 # --- Imports
-import cv2
 import pygame as pg
 import pygame_gui
+from os import listdir
 
 import Params as P
 import Settings as S
 import Additional as A
 import Modes as M
-
+import Logging as L
 
 # --- Variables
 P.isExternal, camera, P.WIDTH, P.HEIGHT = S.getCamBySerial()
@@ -18,7 +18,10 @@ pg.display.set_caption(P.WINDOW_CAM)
 clock = pg.time.Clock()
 
 S.setScreen()
+L.calibrationCreateFirst()
 
+P.threadCount = int( len([f for f in listdir(P.logFolder) if not f.count(".") and
+                 not f.count(P.calibrationFolder[:-1])]) )
 
 # --- Camera
 saveFrame = None
@@ -55,13 +58,7 @@ while isRunning:
                 if P.currentMode == len(P.modes): P.currentMode = 0
 
             if event.key == pg.K_TAB:  # Toggle Settings and Recording modes
-                P.isTextShown = not P.isTextShown
-
-                # TODO: Skip the new recording for windowBuffer
-                #if not P.isRecording:
-                #    P.isTextShown = not P.isTextShown
-                #else:
-                #    A.putTextPy("Recording in progress", (P.WIDTH * .75, P.HEIGHT//2-80), size=25)
+                P.isReady = not P.isReady
 
             if event.key == pg.K_f:  # Flip the frame
                 P.isFlip = not P.isFlip
@@ -93,7 +90,7 @@ while isRunning:
                 M.setModeChoise(P.modes[P.currentMode], True)
 
                 if previousCam == P.cameraMode:
-                    A.putTextPy("No Connection", (P.WIDTH*.75+30, 30), size=20)
+                    A.addText("No Connection", (P.WIDTH * .75 + 30, 30), size=20)
                 else:
                     A.resetAllParams()
 
@@ -106,16 +103,25 @@ while isRunning:
             if event.ui_element == P.buttons[3]:  # Set a background
                 P.medianFrames = []
 
+            if event.ui_element == P.buttons[4]:  # Is saving images enabled
+                P.isImageSave = not P.isImageSave
+
+            if event.ui_element == P.buttons[5]:  # Set previous calibration settings
+                L.calibrationSetPrevious()
+
+            if event.ui_element == P.buttons[6]:  # Save new calibration settings
+                L.calibrationSaveNew()
+
         P.manager.process_events(event)
 
-    if P.isGoing: saveFrame = frame
-    else: A.putTextPy("PAUSE", (P.WIDTH * .8, P.HEIGHT//3-60))
+    if P.isGoing:
+        saveFrame = frame
+    else:
+        A.addText("PAUSE", (P.WIDTH * .8, P.HEIGHT // 3 - 60))
 
     # <<< Work with frame
     M.getFrame(saveFrame, [P.modes[P.currentMode], P.modes[P.lastMode]])
     P.lastMode = P.currentMode
-
-    P.frameCount += 1
 
     # <<< Process the window
     clock.tick(P.FPS)
@@ -124,7 +130,6 @@ while isRunning:
 
     P.manager.draw_ui(P.screen)
     pg.display.flip()
-
 
 # --- Exit
 S.exit(camera, pg)
@@ -136,7 +141,6 @@ OpenCV + PyGame: https://memotut.com/en/f26e2756da774c164a47/
 PyGame Widgets: https://pygamewidgets.readthedocs.io/en/stable/
 PyGame GUI: https://pygame-gui.readthedocs.io/en/latest/index.html
 '''
-
 
 '''
 - Попробовать записывать видео с ухудшением качества

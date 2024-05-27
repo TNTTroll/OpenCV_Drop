@@ -4,9 +4,11 @@ import pygame as pg
 import pygame_gui
 from pypylon import pylon
 from pypylon_opencv_viewer import BaslerOpenCVViewer
+from os import listdir
+from shutil import rmtree
 
 import Params as P
-import Additional as A
+import Logging as L
 
 
 # --- Defs
@@ -26,19 +28,32 @@ def setScreen():
                                                 manager=P.manager)
 
     # Start/Stop record
-    P.buttons[1] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH * .75, P.HEIGHT//2-25), (150, 50)),
+    P.buttons[1] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH * .75, P.HEIGHT // 2 - 25), (150, 50)),
                                                 text="Record", manager=P.manager, visible=False)
 
-    P.buttons[2] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH * .75, P.HEIGHT//2-25), (150, 50)),
+    P.buttons[2] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH * .75, P.HEIGHT // 2 - 25), (150, 50)),
                                                 text="Stop", manager=P.manager, visible=False)
 
     # Set a median
     P.buttons[3] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH * .75, P.HEIGHT // 2 + 50), (150, 50)),
                                                 text="Background", manager=P.manager, visible=False)
 
+    # Enable an image saving mode
+    P.buttons[4] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH * .75, P.HEIGHT // 2 + 125), (150, 50)),
+                                                text="Save images", manager=P.manager, visible=False)
+
+    # Calibration
+    P.buttons[5] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH * .75, P.HEIGHT // 2 - 100), (75, 50)),
+                                                text="Set", manager=P.manager, visible=False)
+
+    P.buttons[6] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH * .825, P.HEIGHT // 2 - 100), (75, 50)),
+                                                text="Save", manager=P.manager, visible=False)
+
 
 def exit(camera, program):
     closeExternalCam(camera) if P.isExternal else closeInternalCam(camera)
+
+    closeFiles()
 
     program.quit()
     cv2.destroyAllWindows()
@@ -46,6 +61,17 @@ def exit(camera, program):
 
     print("\n\nProgram has been closed")
 
+def closeFiles():
+    L.saveFrames(P.windowOut, "EXIT")
+    if P.windowReset == 0: L.mainLog(P.moveFrame)
+
+    try:
+        if P.threadCount > 0:
+            path = P.logFolder + str(P.threadCount).zfill(4)
+            listOfFiles = [f for f in listdir(path + "/") if f.count(".yaml")]
+            if len(listOfFiles) == 0: rmtree(path)
+    except(FileNotFoundError):
+        pass
 
 # <<< Camera
 def getCamBySerial():
@@ -82,7 +108,7 @@ def getCamBySerial():
 
 def setCamSize(camera, type):
     if type == "External":
-        if P.isTextShown:
+        if P.isReady:
             camera.Width.SetValue( int(P.cameraSizeExternal[0] * P.coefficient) )
             camera.Height.SetValue( int(P.cameraSizeExternal[1] * P.coefficient) )
         else:
@@ -90,7 +116,7 @@ def setCamSize(camera, type):
             camera.Height.SetValue( P.cameraSizeExternal[1] )
 
     else:
-        if P.isTextShown:
+        if P.isReady:
             camera.set( cv2.CAP_PROP_FRAME_WIDTH, int(P.cameraSizeInternal[0] * P.coefficient) )
             camera.set( cv2.CAP_PROP_FRAME_HEIGHT, int(P.cameraSizeInternal[1] * P.coefficient) )
 

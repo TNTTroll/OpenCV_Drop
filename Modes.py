@@ -23,6 +23,7 @@ def getFrame(frame, mode):
 
     try:
         frame = modeChoise(mode[0], frame)
+        A.setText()
         P.screen.blit(A.convertForPygame(frame), (0, 0))
 
         if P.isRecording:
@@ -34,7 +35,7 @@ def getFrame(frame, mode):
     except(cv2.error, TypeError, AttributeError):
         A.putTextPy("| NO SIGNAL |", (P.WIDTH // 4, P.HEIGHT // 2))
 
-    if P.isTextShown:
+    if P.isReady:
 
         if not P.sliders[0].visible:
             setModeChoise(mode[0], True)
@@ -42,20 +43,25 @@ def getFrame(frame, mode):
         if P.buttons[1].visible:
             P.buttons[1].hide()
 
-        if P.buttons[3].visible:
-            P.buttons[3].hide()
+            for i in range(3, 7):
+                P.buttons[i].hide()
 
         setTextMode(mode[0])
 
         A.putTextPy(f"< {mode[0]} >", (P.WIDTH * .75, P.HEIGHT-40))
 
-        if P.pxSizeframe != 0:
+        if P.pxSizeFrame != 0:
             A.putTextPy(f"PX between dots: {round(P.cellPX, 3)}", (P.WIDTH * .75, P.HEIGHT - 150), size=30)
-            A.putTextPy(f"PX Size (MM): {round(P.pxSizeframe, 4)}", (P.WIDTH * .75, P.HEIGHT - 120), size=30)
+            A.putTextPy(f"PX Size (MM): {round(P.pxSizeFrame, 4)}", (P.WIDTH * .75, P.HEIGHT - 120), size=30)
 
-    else:
+    else:  # "Tab" Mode
         if P.sliders[0].visible:
             setModeChoise(mode[0], False)
+
+        A.putTextPy(P.calibrationText, (P.WIDTH * .76, P.HEIGHT // 2 - 125), size=20)
+        if not P.buttons[4].visible:
+            for i in range(4, 7):
+                P.buttons[i].show()
 
         if P.isRecording:
             A.putTextPy("Recording...", (P.WIDTH * .75, P.HEIGHT//3-60))
@@ -135,9 +141,9 @@ def getConnected(frame, mask):
         if (w * h > P.sets[10] and t != 2147483647):
             cv2.rectangle(frame, (l, t), (w + l, h + t), (255, 0, 255), 1)
 
-            if P.pxSizeframe != 0:
-                textWidth = f"{round((P.pxSizeframe * w), 3)}mm"
-                textHeight = f"{round((P.pxSizeframe * h), 3)}mm"
+            if P.pxSizeFrame != 0:
+                textWidth = f"{round((P.pxSizeFrame * w), 3)}mm"
+                textHeight = f"{round((P.pxSizeFrame * h), 3)}mm"
             else:
                 textWidth = f"{w}px"
                 textHeight = f"{h}px"
@@ -170,9 +176,9 @@ def getObjects(frame, mask):
         if (w * h > P.sets[10] and t != 2147483647):
             cv2.rectangle(frame, (l, t), (w + l, h + t), (255, 0, 255), 1)
 
-            if P.pxSizeframe != 0:
-                textWidth = f"{round((P.pxSizeframe * w), 3)}mm"
-                textHeight = f"{round((P.pxSizeframe * h), 3)}mm"
+            if P.pxSizeFrame != 0:
+                textWidth = f"{round((P.pxSizeFrame * w), 3)}mm"
+                textHeight = f"{round((P.pxSizeFrame * h), 3)}mm"
             else:
                 textWidth = f"{w}px"
                 textHeight = f"{h}px"
@@ -225,7 +231,7 @@ def setTextSettings():
 def setModeChess(set):
     if set:
         for x in range(2):
-            P.sliders[x].set_current_value(P.checkField[x])
+            P.sliders[x].set_current_value(P.chessField[x])
             P.sliders[x].show()
 
     else:
@@ -260,7 +266,8 @@ def modeChess(frame):
 
             chessWidthPX = P.cellPX * (ncol + 1)
 
-            P.pxSizeframe = P.realSize / chessWidthPX
+            P.pxSizeFrame = P.realSize / chessWidthPX
+            P.chessPhoto = cornersChess
 
     return frame
 def setTextChess():
@@ -359,7 +366,7 @@ def modeMovement(frame):
             P.timeStart = time.time()
             P.isRecDynamic = True
 
-            P.path = "%s%s.avi"%(P.folder, time.strftime(P.timeFormat, time.gmtime()))
+            P.path = "%s%s%s" % (P.folder, time.strftime(P.timeFormat, time.gmtime()), P.fileType)
             A.recording(True)
     else:
         if P.timeStart != 0:
@@ -369,7 +376,7 @@ def modeMovement(frame):
 
                 if time.time() - P.timeStart < P.timeGap:
                     os.remove(P.path)
-                    A.putTextPy(f"Deleted. {round((time.time() - P.timeStart), 2)}s", (P.WIDTH * .75, P.HEIGHT // 2), size=30)
+                    A.addText(f"Deleted. {round((time.time() - P.timeStart), 2)}s", (P.WIDTH * .75, P.HEIGHT // 2), size=30)
 
             P.timeFramesCount = 0
             P.isRecDynamic = False
@@ -386,46 +393,23 @@ def setTextMovement():
 def setModeWindow(set):
     if set:
         for x in range(len(P.slidersWindowMode)):
-            P.sliders[x].set_current_value(P.sets[x])
+            P.sliders[x].set_current_value([0, 0, 7, 7][x])
             P.sliders[x].show()
 
-        P.sliders[-1].set_current_value(P.sets[-1])
+        P.sliders[-1].set_current_value([0][-1])
         P.sliders[-1].show()
 
-        P.path = "%s%s.avi" % (P.folder, time.strftime(P.timeFormat, time.gmtime()))
+        A.createFolder()
+        P.path = "%s%s%s" % (P.logFolder + str(P.threadCount).zfill(4)+"/", time.strftime(P.timeFormat, time.gmtime()), P.fileType)
         P.windowOut = cv2.VideoWriter(P.path, P.fourcc, P.FPS, (640, 480))
 
-        P.logFrame = open(P.logFolder + P.logFrameName, "a+")
-        P.logQueue = open(P.logFolder + P.logQueueName, "a+")
+        P.calibreId = -1
 
     else:
         for slider in P.sliders: slider.hide()
         P.sliders[-1].hide()
-        P.windowOut.release()
-
-        P.logFrame.close()
-        P.logQueue.close()
+        L.saveFrames(P.windowOut, "EXIT")
 def modeWindow(frame):
-    def saveFrames():
-        if P.moveFrame > 5:  # TODO: Change for drop (less frames needed to be)
-            for i in range(len(P.windowStaticArray) - 1):
-                try:
-                    if P.windowStaticArray[P.currentFrame % 50] != 0: pass
-                except(ValueError):
-                    P.windowOut.write(P.windowStaticArray[P.currentFrame % 50])
-
-                P.currentFrame += 1
-
-            for i in range(P.moveFrame):
-                P.windowOut.write(P.windowMoveArray[i])
-
-            P.windowOut.release()
-            P.path = "%s%s.avi" % (P.folder, time.strftime(P.timeFormat, time.gmtime()))
-            P.windowOut = cv2.VideoWriter(P.path, P.fourcc, P.FPS, (640, 480))
-
-        P.currentFrame %= 50
-        P.moveFrame = 0
-
     for x in range(len(P.sets)):
         P.sets[x] = P.sliders[x].get_current_value()
 
@@ -452,48 +436,60 @@ def modeWindow(frame):
 
     diff = cv2.bitwise_and(frame, frame, mask=mask)
 
+    # mask.sum() > thresh
+    # посмотреть, что суммирование по обоим координатам
+
     connection, objects = getObjects(diff, mask)
 
     frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
 
     if len(objects) > 0:  # There are object on the scene
+        if not P.isWindowPause:
+            P.windowStaticToMove += (str(P.currentFrame) + "|")
+            P.isWindowPause = True
+
         P.windowMoveArray[P.moveFrame] = frame
         P.moveFrame += 1
         if P.moveFrame == len(P.windowMoveArray) - 1:
-            saveFrames()
+            pass
+            P.windowOut = L.saveFrames(P.windowOut, "MODE")
 
         if P.windowReset == 1:
             P.windowMax = 0
 
-        P.windowMax = max(P.windowMax, len(objects)-1)
         P.windowReset = 0
-
+        P.windowMax = max(P.windowMax, len(objects)-1)
         P.windowBuffer = [connection] + P.lastFrames[0:-1]
 
-        if len(P.queueDrops) - P.inactiveDrops < len(objects):
-            P.queueDrops.append( Drop(objects[0].areaPX[0], objects[0].width[0],
-                                      objects[0].height[0], objects[0].left[0], objects[0].top[0]) )
+        P.staticFrames = P.cayotTime
+
+        if len(P.mainDrops) - P.inactiveDrops < len(objects):
+            P.mainDrops.append( Drop(objects[0].areaPX[0], objects[0].width[0],
+                                     objects[0].height[0], objects[0].left[0], objects[0].top[0]) )
 
         elif len(objects) - P.inactiveDrops > len(objects):
             P.inactiveDrops += 1
 
-        if len(objects) > 0:
-            for x in range(P.inactiveDrops, len(objects)):
-                objects[x].addParam(objects[x])
+        for x in range(P.inactiveDrops, len(objects)):
+            objects[x].addParam(objects[x])
 
     else:  # Static scene
+        if P.isWindowPause:
+            P.windowStaticToMove += (str(P.moveFrame) + "&")
+            P.isWindowPause = False
+
         P.windowStaticArray[P.currentFrame] = frame
         P.currentFrame += 1
         if P.currentFrame >= len(P.windowStaticArray) - 1: P.currentFrame = 0
 
-        if P.windowReset == 0:
-            if P.moveFrame != 0: L.queueLog(P.moveFrame)
-            P.lastFrames = P.windowBuffer
-
         if P.moveFrame != 0:
-            saveFrames()
+            if P.staticFrames == 0:
+                P.windowOut = L.saveFrames(P.windowOut, "MODE")
+                P.staticFrames = P.cayotTime
+            else:
+                P.staticFrames -= 1
 
-        P.windowReset = 1
+            A.putTextPy(f"Cayot time: {P.staticFrames}", (P.WIDTH * .75, P.HEIGHT // 2), size=30)
 
     A.putTextPy(f"Objects: {len(objects)}", (P.WIDTH * .75, P.HEIGHT // 2 - 40), size=30)
     A.putTextPy(f"Max: {P.windowMax}", (P.WIDTH * .75, P.HEIGHT // 2 - 20), size=30)
@@ -501,9 +497,9 @@ def modeWindow(frame):
     A.putTextCv(frame, f"A: {P.currentFrame}", (50, 50))
     A.putTextCv(frame, f"B: {P.moveFrame}", (50, 100))
 
-    if 0 < len(objects) < 10: L.frameLog(objects)
+    if 0 < len(objects): L.frameLog(objects)
 
-    return connection
+    return frame
 def setTextWindow():
     for x in range(len(P.slidersWindowMode)):
         A.putTextPy(f"{P.slidersWindowMode[x]}: {P.sets[x]}", (P.WIDTH - 300, 75 + (25 * x)), size=20)

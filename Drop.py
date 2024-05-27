@@ -3,10 +3,11 @@ import Params as P
 
 
 # --- Class
+# Class for an object on the screen. Collecting all information, store and update it
 class Drop:
     def __init__(self, _area, _width, _height, _left, _top):
         self.areaPX = [_area]
-        self.areaMM = [round((self.areaPX / P.pxSizeframe), 3) if P.pxSizeframe != 0 else 0]
+        self.areaMM = [round((self.areaPX / P.pxSizeFrame), 3) if P.pxSizeFrame != 0 else 0]
         self.width = [_width]
         self.height = [_height]
         self.left = [_left]

@@ -12,17 +12,13 @@ playable = True
 
 video.set(cv2.CAP_PROP_POS_FRAMES, start)
 
-A = [x for x in range(10)]
 
 # ----- Main
 while True:
 
-
     ret, frame = video.read()
 
 
-    print(A)
-    print(sum(A))
 
 
     cv2.imshow(WINDOW_VIDEO, frame)

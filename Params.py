@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 
+
 # PROGRAM
 screen = None
 manager = None
@@ -34,19 +35,26 @@ serialNumber = '22193655'   # Camera from SkolTech
 winSettings = np.zeros((100, 300, 3), np.uint8)
 winSettings[:, :, :] = 240
 
+texts = []
+textTimeShow = 20
+
+BG = None
+
 # MODES
 currentMode = lastMode = 0  # Current and previous modes
 
-modes = ["DEFAULT", "SETTINGS", "CHESS", "DIFFERENT", "MOVEMENT", "PLAY", "WINDOW"] # Modes for camera
+modes = ["DEFAULT", "SETTINGS", "CHESS", "DIFFERENT", "MOVEMENT", "PLAY", "WINDOW"]  # Modes for camera
 
-isTextShown = True 			# Show "mode" naming
+isReady = True 			    # Show "mode" naming
 
 realSize = 29.8 			# Real size for checkerboard
 
 sliders = []                # Sliders for 'Settings' mode
-buttons = ["Cam Mode",      # Buttons
-           "Record", "Stop",
-           "Median"]
+buttons = ["Cam Mode",          # Buttons
+           "Record", "Stop",    # Recording frames
+           "Median",            # Save median
+           "Save images",       # Enable saving images during recording
+           "Previous", "Save"]  # Set/Save calibration
 
 lastFrameMode = 0
 lastFrames = []
@@ -55,9 +63,10 @@ lastFrameName = "Last Frames"
 windowBuffer = []
 
 # RECORD
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
+fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 folder = "folder/"
-path = "_.avi"
+fileType = ".avi"
+path = "_" + fileType
 timeFormat = "%d.%m.%y_%H-%M-%S"
 out = None
 
@@ -85,9 +94,10 @@ maxs = [255, 255, 255, 255, 255, 255,
         WIDTH*HEIGHT]
 
 # CHESS
-checkField = [4, 5]
+chessField = [4, 5]
+chessPhoto = None
 
-cellPX = pxSizeframe = 0
+cellPX = pxSizeFrame = 0
 
 # DIFFERENT
 medianLength = 50
@@ -106,15 +116,32 @@ windowOut = None
 currentFrame = moveFrame = 0
 windowStaticArray = [0 for x in range(50)]   # For static frames
 windowMoveArray = [0 for x in range(50)]  # For movements on the scene
-windowMax = windowReset = 0
+windowStaticToMove = ""
+windowStart = 0
+isWindowPause = False
+windowMax = windowReset = 1
+cayotTime = staticFrames = 10
 
 # LOGGING
-logFolder = "logging/"
-
-logFrameName = "frames.txt"
-logFrame = None
+logFolder = "data/"
+logImagesName = "/images/"
+logMainName = "_main.csv"
+logParamsName = "/params.csv"
+logFrameName = "_test.yaml"
+logDetailedFrameName = "_detailed.yaml"
+logChessName = "/chess.png"
+logBGName = "/bg.png"
+logFrameImageName = "_frame.png"
 
 inactiveDrops = 0
-queueDrops = []
-logQueueName = "queue.txt"
-logQueue = None
+mainDrops = []
+logMain = None
+logFrame = None
+
+isImageSave = True
+
+# CALIBRATION
+calibrationFolder = "_calibration/"
+calibrationText = "Calibration settings"
+
+calibreId = -1

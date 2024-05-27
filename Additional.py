@@ -2,17 +2,29 @@
 import cv2
 import numpy as np
 import pygame as pg
+from os import mkdir
 
 import Params as P
+from Text import Text
 
 
 # --- Defs
 # <<< Text
+def addText(text, pos, color=(240, 240, 240), size=40):
+    P.texts.append( Text(P.textTimeShow, text, pos, color, size) )
+def setText():
+    i = 0
+    while i < len(P.texts):
+        text = P.texts[i].getInfo()
+        if text == 0:
+            P.texts.pop(i)
+        else:
+            putTextPy(text[0], text[1], text[2], text[3])
+        i += 1
 def putTextPy(text, pos, color=(240, 240, 240), size=40):
     font = pg.font.SysFont(None, size)
     showText = font.render(str(text), True, color)
     P.screen.blit(showText, (pos[0], pos[1]))
-
 def putTextCv(frame, text, pos, color=(240, 240, 240), size=1):
     font = cv2.FONT_HERSHEY_SIMPLEX
     org = (pos[0], pos[1])
@@ -43,7 +55,7 @@ def getMedian(frame):
 
         P.medianFrames.append(0)  # Make array's len = need len. Stop array filling
 
-        putTextPy("Saved", (P.WIDTH * .8, P.HEIGHT // 2 + 125), size=30)
+        addText("Saved", (P.WIDTH * .8, P.HEIGHT // 2 + 125), size=30)
 
 # <<< Output frame
 def convertForPygame(cvFrame):
@@ -59,6 +71,16 @@ def convertForPygame(cvFrame):
     return image
 
 # <<< Recording
+def createFolder():
+    P.threadCount += 1
+    path = P.logFolder + str(P.threadCount).zfill(4)
+
+    print(path)
+    mkdir(path)
+
+    if P.isImageSave:
+        mkdir(path + "/images")
+
 def recording(set):
     P.isRecording = set
     if set:

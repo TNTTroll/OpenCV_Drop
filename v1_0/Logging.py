@@ -20,15 +20,15 @@ def writeFrame(out, frame):
 def saveFrames(out, way):
     if out is None: return out
 
-    if P.windowReset == 0:
-        mainLog(P.moveFrame)
+    if P.objectMoveReset == 0:
+        mainLog(P.moveFrame, 0)
         P.lastFrames = P.windowBuffer
 
-        P.windowReset = 1
+        P.objectMoveReset = 1
 
-    P.windowStart = finish = 0
-    if len(P.windowStaticToMove.split("&")) > 0:
-        for pair in P.windowStaticToMove.split("&"):
+    P.writeStart = finish = 0
+    if len(P.writeStaticToMove.split("&")) > 0:
+        for pair in P.writeStaticToMove.split("&"):
             border = pair.split("|")
 
             if border[0] == "": break  # If there is no cuttings
@@ -36,50 +36,40 @@ def saveFrames(out, way):
             if border[1] == "":  # If there is an overflow, no finish position
                 border[1] = 50 if way != "EXIT" else P.moveFrame
 
-            for i in range(P.windowStart, int(border[0])):  # Saving static frames
-                writeFrame(out, P.windowStaticArray[i])
+            for i in range(P.writeStart, int(border[0])):  # Saving static frames
+                writeFrame(out, P.staticArray[i])
             for i in range(finish, int(border[1])):  # Saving dynamic frames
-                writeFrame(out, P.windowMoveArray[i])
-            P.windowStart = int(border[0])
+                writeFrame(out, P.moveArray[i][0])
+            P.writeStart = int(border[0])
             finish = int(border[1])
 
     for i in range(P.cayotTime):
-        if P.windowStart + i < 50:
-            writeFrame(out, P.windowStaticArray[P.windowStart + i])
+        if P.writeStart + i < 50:
+            writeFrame(out, P.staticArray[P.writeStart + i])
         else: break
 
     if P.isImageSave:
         for i in range(finish):
             cv2.imwrite(P.logFolder + str(P.threadCount).zfill(4) + P.logImagesName
-                        + str(i+1).zfill(2) + P.logFrameImageName,
-                        P.windowMoveArray[i])
+                        + str(i+1).zfill(4) + P.logFrameImageName,
+                        P.moveArray[i][0])
+            cv2.imwrite(P.logFolder + str(P.threadCount).zfill(4) + P.logImagesName
+                        + str(i + 1).zfill(4) + P.logMaskImageName,
+                        P.moveArray[i][1])
 
     out.release()
-    if way != "EXIT":
-        A.createFolder()
-        P.path = P.logFolder + str(P.threadCount).zfill(4) + "/" + time.strftime(P.timeFormat, time.gmtime()) + P.fileType
-        out = cv2.VideoWriter(P.path, P.fourcc, P.FPS, (640, 480))
+    if way != "EXIT": A.createFolder()
 
-        # Выдавать коды ошибок при ошибках out
-
-    P.windowStaticToMove = ""
+    P.writeStaticToMove = ""
     P.currentFrame = 0
     P.moveFrame = 0
 
     return out
 
 # <<< Text
-def frameLog(drops):  # Logging every frame
+def frameLog(drops, folderPath):  # Logging every frame
 
     P.frameCount += 1
-    folderPath = P.logFolder + str(P.threadCount).zfill(4) + "/"
-    with open(folderPath + "t" + str(P.frameCount).zfill(3) + P.logFrameName, "w+") as file:  # t00N_test.yaml
-        data = {
-            "Frame number": P.frameCount,
-            "Droplets count": len(drops)
-        }
-        yaml.dump(data, file)
-
     with open(folderPath + P.logDetailedFrameName, "a+") as file:  # _detailed.yaml
         data = {
             "Droplets count": len(drops),
@@ -95,22 +85,31 @@ def frameLog(drops):  # Logging every frame
                 "Top offset": int(drops[i].top[0])
             }
 
-            data["Info"]["drop_" + str(i+1).zfill(2)] = drop
+            data["Info"]["drop_" + str(i+1).zfill(4)] = drop
 
         yaml.dump(data, file)
 
-def mainLog(length):  # Main file with all logging
+def mainLog(length, move):  # Main file with all logging
     P.frameCount = 0
 
     drops = ""
     for x in range(1, len(P.mainDrops)):
-        drops = drops + str(P.mainDrops[x].getAreaMM()) + ", "
+        drops = drops + str(P.mainDrops[x].getAreaMM()) + "|" + str( round(P.mainDrops[x].getSpeed(), 2) ) + ", "
     drops = drops[:-2]
 
-    with open(P.logFolder + P.logMainName, 'a+', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow([str(P.threadCount).zfill(4)] + [len(P.mainDrops)] + [P.mainDrops[0].getAreaMM()]
-                        + [drops] + [length] + [P.calibreId] + [P.isImageSave])
+    if len([f for f in listdir(P.logFolder) if f.count("_main")]) == 0:
+        with open(P.logFolder + P.logMainName, 'w+', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["THREAD ID_DROP AMOUNT_FIRST DROP AREA_ALL DROPS AREAS_FRAME COUNT_CALIBRE ID_IsImageSave"])
+            if len(P.mainDrops) > 0:
+                writer.writerow([str(P.threadCount-1-move).zfill(4)] + [len(P.mainDrops)] + [P.mainDrops[0].getAreaMM()]
+                                + [drops] + [length] + [P.calibreId] + [P.isImageSave])
+    else:
+        with open(P.logFolder + P.logMainName, 'a', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            if len(P.mainDrops) > 0:
+                writer.writerow([str(P.threadCount-1-move).zfill(4)] + [len(P.mainDrops)] + [P.mainDrops[0].getAreaMM()]
+                                + [drops] + [length] + [P.calibreId] + [P.isImageSave])
 
     P.queueDrops = []
     P.inactiveDrops = 0
@@ -127,7 +126,12 @@ def calibrationSetPrevious():
         # Params
         with open(prevCalFolder + P.logParamsName, "r", newline="") as file:
             reader = csv.reader(file)
+            firstRow = True
             for row in reader:
+                if firstRow:
+                    firstRow = False
+                    break
+
                 P.chessField[0] = row[0]
                 P.chessField[1] = row[1]
                 P.pxSizeFrame = row[2]
@@ -160,6 +164,7 @@ def calibrationSaveNew():
     # Params
     with open(folderName + P.logParamsName, "w+", newline="") as file:
         writer = csv.writer(file)
+        writer.writerow(["CHESS WIDTH_CHESS HEIGHT_PIXEL SIZE"])
         writer.writerow([P.chessField[0], P.chessField[1], P.pxSizeFrame])
 
     # Chess

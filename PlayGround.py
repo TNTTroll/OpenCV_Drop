@@ -1,32 +1,40 @@
-# ----- Imports
+# --- Imports
 import cv2
+import numpy as np
+import ctypes
 
 
-# ----- Variables
-WINDOW_VIDEO = "Video"
-videoName = "1.mp4"
-video = cv2.VideoCapture(videoName)
-
-start = 0
-playable = True
-
-video.set(cv2.CAP_PROP_POS_FRAMES, start)
+# --- Variables
+camera = cv2.VideoCapture(0)
+WINDOW_NAME = 'Video'
 
 
-# ----- Main
-while True:
+x = []
+x.append('1')
+x.append('4')
+x.append('5')
+print(x)
 
-    ret, frame = video.read()
+x = [elt.encode("utf-8") for elt in x]
+print(x)
+
+buffer = (ctypes.c_char_p * 3)(*x)
+print(buffer)
+
+arr = [elt.decode("utf-8") for elt in buffer]
+print(arr)
 
 
+# --- Main
+while False:
+    _, frame = camera.read()
 
-
-    cv2.imshow(WINDOW_VIDEO, frame)
-
-    k = cv2.waitKey(10)
-    if k == ord('q'):
+    cv2.imshow(WINDOW_NAME, frame)
+    if cv2.waitKey(1) == ord('q'):
         break
 
-# ----- Exit
+
+# --- Exit
+camera.release()
 cv2.destroyAllWindows()
 cv2.waitKey(10)

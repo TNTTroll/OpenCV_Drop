@@ -2,6 +2,7 @@
 import pygame as pg
 import pygame_gui
 from os import listdir
+from time import time
 
 import Params as P
 import Settings as S
@@ -22,6 +23,7 @@ L.calibrationCreateFirst()
 
 P.threadCount = int( len([f for f in listdir(P.logFolder) if not f.count(".") and
                  not f.count(P.calibrationFolder[:-1])]) )
+
 
 # --- Camera
 saveFrame = None
@@ -65,6 +67,11 @@ while isRunning:
 
             if event.key == pg.K_SPACE:  # Pause the video
                 P.isGoing = not P.isGoing
+
+            if event.key == pg.K_F3 and not P.isFPS:  # Get camera FPS
+                P.isFPS = not P.isFPS
+                P.FPSStart = time()
+                P.FPSCount = 0
 
             # Control the "Last frame" mode
             if event.key == pg.K_w:
@@ -122,6 +129,9 @@ while isRunning:
     # <<< Work with frame
     M.getFrame(saveFrame, [P.modes[P.currentMode], P.modes[P.lastMode]])
     P.lastMode = P.currentMode
+
+    # <<< FPS
+    if P.isFPS: S.fps()
 
     # <<< Process the window
     clock.tick(P.FPS)

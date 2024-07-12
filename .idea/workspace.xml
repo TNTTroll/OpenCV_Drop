@@ -4,64 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ac5af6fb-780d-434c-a0eb-0f07d7c464dc" name="Changes" comment="A-B matrix">
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/CLAllSerial_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/CLProtocol_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/CLSerCOM.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/GCBase_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/GenApi_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/GenCP_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/ImageConvert.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/Log_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/MVProducerGEV.cti" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/MVProducerU3V.cti" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/MVSDKmd.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/MVlog4cppmd.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/MathParser_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/NodeMapData_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/SDKLOG_default.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/SharpnessDetection.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/XmlParser_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/iImageProcessing.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/Win32/log4cpp_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/CLAllSerial_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/CLProtocol_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/CLSerCOM.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/GCBase_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/GenApi_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/GenCP_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/ImageConvert.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/Log_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/MVProducerGEV.cti" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/MVProducerU3V.cti" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/MVSDKmd.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/MVlog4cppmd.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/MathParser_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/NodeMapData_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/SDKLOG_default.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/SharpnessDetection64.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/XmlParser_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/iImageProcessing64.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Runtime/x64/log4cpp_MD_VC120_v3_0.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_0/Additional.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_0/IMVApi_1.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_0/IMVDefines_1.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_0/Median_BG.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_0/Settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v2_0/IMVDefines_2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v2_0/Main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Additional.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Drop.py" beforeDir="false" afterPath="$PROJECT_DIR$/v1_0/Drop.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Logging.py" beforeDir="false" afterPath="$PROJECT_DIR$/v1_0/Logging.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/v1_0/Main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Median_BG.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modes.py" beforeDir="false" afterPath="$PROJECT_DIR$/v1_0/Modes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Params.py" beforeDir="false" afterPath="$PROJECT_DIR$/v1_0/Params.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PlayGround.py" beforeDir="false" afterPath="$PROJECT_DIR$/PlayGround.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Settings.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text.py" beforeDir="false" afterPath="$PROJECT_DIR$/v1_0/Text.py" afterDir="false" />
-    </list>
+    <list default="true" id="ac5af6fb-780d-434c-a0eb-0f07d7c464dc" name="Changes" comment="V2_0" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -113,6 +56,8 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Notification.DisplayName-DoNotAsk-Vcs Notifications": "VCS notifications",
+    "Notification.DoNotAsk-Vcs Notifications": "true",
     "Python.Additional.executor": "Run",
     "Python.Demo_opencv_byGetFrame.executor": "Run",
     "Python.Drop.executor": "Run",
@@ -264,7 +209,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716830489874</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="V2_0">
+      <option name="closed" value="true" />
+      <created>1720785799167</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1720785799167</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -287,6 +240,7 @@
     <MESSAGE value="Window" />
     <MESSAGE value="Logging" />
     <MESSAGE value="A-B matrix" />
-    <option name="LAST_COMMIT_MESSAGE" value="A-B matrix" />
+    <MESSAGE value="V2_0" />
+    <option name="LAST_COMMIT_MESSAGE" value="V2_0" />
   </component>
 </project>

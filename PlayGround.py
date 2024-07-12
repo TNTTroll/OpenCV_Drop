@@ -1,48 +1,40 @@
-# ------------ Imports
+# --- Imports
 import cv2
-import os
-import time
 import numpy as np
-
-# ------------ Variables
-cam_Width = 640
-cam_Height = 480
-
-cameraName = "Camera"
-
-cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-cam.set(cv2.CAP_PROP_FRAME_WIDTH, cam_Width)
-cam.set(cv2.CAP_PROP_FRAME_HEIGHT, cam_Height)
-
-cv2.namedWindow(cameraName)
+import ctypes
 
 
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-path = r"123.avi"
-
-f = "%d.%m.%y_%H-%M-%S"
-
-t = "folder/%s.avi"%(time.strftime(f, time.gmtime()))
-out = cv2.VideoWriter(t, fourcc, 30, (640, 480))
+# --- Variables
+camera = cv2.VideoCapture(0)
+WINDOW_NAME = 'Video'
 
 
-# ------------ Camera
-while True:
-    ret, frame = cam.read()
+x = []
+x.append('1')
+x.append('4')
+x.append('5')
+print(x)
 
-    out.write(frame)
+x = [elt.encode("utf-8") for elt in x]
+print(x)
+
+buffer = (ctypes.c_char_p * 3)(*x)
+print(buffer)
+
+arr = [elt.decode("utf-8") for elt in buffer]
+print(arr)
 
 
-    cv2.imshow(cameraName, frame)
+# --- Main
+while False:
+    _, frame = camera.read()
 
-    k = cv2.waitKey(10) & 0xFF
-
-    if ((not ret) or (k == ord('q') or k == ord('й'))):
+    cv2.imshow(WINDOW_NAME, frame)
+    if cv2.waitKey(1) == ord('q'):
         break
 
-# ------------ Exit
-out.release()
 
-cam.release()
+# --- Exit
+camera.release()
 cv2.destroyAllWindows()
 cv2.waitKey(10)

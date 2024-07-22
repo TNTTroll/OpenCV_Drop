@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ac5af6fb-780d-434c-a0eb-0f07d7c464dc" name="Changes" comment="V2_0" />
+    <list default="true" id="ac5af6fb-780d-434c-a0eb-0f07d7c464dc" name="Changes" comment="Эверисинк">
+      <change afterPath="$PROJECT_DIR$/Temp.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/v2_0/Vault.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PlayGround.py" beforeDir="false" afterPath="$PROJECT_DIR$/PlayGround.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v2_0/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/v2_0/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v2_0/grabSave/out.avi" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -53,33 +60,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Notification.DisplayName-DoNotAsk-Vcs Notifications": "VCS notifications",
-    "Notification.DoNotAsk-Vcs Notifications": "true",
-    "Python.Additional.executor": "Run",
-    "Python.Demo_opencv_byGetFrame.executor": "Run",
-    "Python.Drop.executor": "Run",
-    "Python.IMVApi.executor": "Run",
-    "Python.Logging.executor": "Run",
-    "Python.Main.executor": "Run",
-    "Python.Modes.executor": "Run",
-    "Python.Params.executor": "Run",
-    "Python.PlayGround.executor": "Run",
-    "Python.PyGame.executor": "Run",
-    "Python.Settings.executor": "Run",
-    "Python.V1.0.executor": "Run",
-    "Python.V2.0.executor": "Run",
-    "Python.main.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "ToolWindowRun.ShowToolbar": "false",
-    "git-widget-placeholder": "v3.0",
-    "last_opened_file_path": "C:/Users/Spectre/PycharmProjects/OpenDrop/v2_0/main.py",
-    "settings.editor.selected.configurable": "vcs.Git"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Notification.DisplayName-DoNotAsk-Vcs Notifications&quot;: &quot;VCS notifications&quot;,
+    &quot;Notification.DoNotAsk-Vcs Notifications&quot;: &quot;true&quot;,
+    &quot;Python.Additional.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Demo_opencv_byGetFrame.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Drop.executor&quot;: &quot;Run&quot;,
+    &quot;Python.IMVApi.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Logging.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Modes.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Params.executor&quot;: &quot;Run&quot;,
+    &quot;Python.PlayGround.executor&quot;: &quot;Run&quot;,
+    &quot;Python.PyGame.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Settings.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Temp.executor&quot;: &quot;Run&quot;,
+    &quot;Python.V1.0.executor&quot;: &quot;Run&quot;,
+    &quot;Python.V2.0.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;ToolWindowRun.ShowToolbar&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;v3.0&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Spectre/PycharmProjects/OpenDrop/v2_0/main.py&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Spectre\PycharmProjects\OpenDrop\v1_0" />
@@ -217,7 +225,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720785799167</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Эверисинк">
+      <option name="closed" value="true" />
+      <created>1720787257481</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1720787257481</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -241,6 +257,7 @@
     <MESSAGE value="Logging" />
     <MESSAGE value="A-B matrix" />
     <MESSAGE value="V2_0" />
-    <option name="LAST_COMMIT_MESSAGE" value="V2_0" />
+    <MESSAGE value="Эверисинк" />
+    <option name="LAST_COMMIT_MESSAGE" value="Эверисинк" />
   </component>
 </project>

@@ -1,37 +1,40 @@
 # --- Imports
 import cv2
 import numpy as np
-import ctypes
+import socket
 
 
 # --- Variables
 camera = cv2.VideoCapture(0)
-WINDOW_NAME = 'Video'
+windowName = 'Video'
 
 
-x = []
-x.append('1')
-x.append('4')
-x.append('5')
-print(x)
+HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
+PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 
-x = [elt.encode("utf-8") for elt in x]
-print(x)
-
-buffer = (ctypes.c_char_p * 3)(*x)
-print(buffer)
-
-arr = [elt.decode("utf-8") for elt in buffer]
-print(arr)
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.bind((HOST, PORT))
+    s.listen()
+    conn, addr = s.accept()
+    with conn:
+        print(f"Connected by {addr}")
+        while True:
+            data = conn.recv(1024)
+            if not data:
+                break
+            conn.sendall(data)
 
 
 # --- Main
+'''
 while False:
-    _, frame = camera.read()
+    ret, frame = camera.read()
+    if not ret: break
 
-    cv2.imshow(WINDOW_NAME, frame)
+    cv2.imshow(windowName, frame)
     if cv2.waitKey(1) == ord('q'):
         break
+'''
 
 
 # --- Exit

@@ -3,17 +3,20 @@
 import sys
 import ctypes
 import platform
-from IMVDefines import *
+from v3_0.IMVDefines import *
 
 
 # 加载SDK动态库
 # load SDK library
 if sys.platform == 'win32':
     bits, linkage = platform.architecture()
-    if bits == '64bit':
-        MVSDKdll = WinDLL("Runtime/x64/MVSDKmd.dll")
-    else:
-        MVSDKdll = WinDLL("Runtime/Win32/MVSDKmd.dll")
+    try:
+        if bits == '64bit':
+            MVSDKdll = WinDLL("../Runtime/x64/MVSDKmd.dll")
+        else:
+            MVSDKdll = WinDLL("../Runtime/Win32/MVSDKmd.dll")
+    except(OSError):
+        pass
 
 class MvCamera():
 

@@ -5,6 +5,7 @@ from time import time
 
 import Params as P
 import Additional as A
+import Modes as M
 import Settings as S
 
 
@@ -15,7 +16,7 @@ pg.display.set_caption(P.windowName)
 clock = pg.time.Clock()
 
 S.setScreen()
-camera = S.getCamera()
+#camera = S.getCamera()
 
 
 # --- Camera
@@ -26,7 +27,7 @@ while isRunning:
     t = S.setBG(t)
     frame = None
 
-    # <<< Control Panel
+    # <<< CONTROL PANEL
     for event in pg.event.get():
         if event.type == pg.KEYDOWN:  # Exit the program
             if event.key == pg.K_q:
@@ -34,24 +35,27 @@ while isRunning:
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == P.buttons[0]:  # Record
-                pass
+                # M.startRecord(camera)
+                S.updating(False)
 
             if event.ui_element == P.buttons[1]:  # Replay
-                pass
+                M.replay()
 
             if event.ui_element == P.buttons[2]:  #Logging
-                A.setText("IN DEV", (P.WIDTH//2-50, P.HEIGHT*.9))
+                A.addText("IN DEV", (P.WIDTH//2-50, P.HEIGHT*.9))
 
         P.manager.process_events(event)
 
-    # <<< Process the window
-    clock.tick(P.FPS)
-    time_delta = clock.tick(60) / 1000.0
-    P.manager.update(time_delta)
+    # <<< PROCESS THE WINDOW
+    if P.isUpdate:
+        clock.tick(P.FPS)
+        time_delta = clock.tick(60) / 1000.0
+        P.manager.update(time_delta)
 
-    P.manager.draw_ui(P.screen)
-    pg.display.flip()
+        P.manager.draw_ui(P.screen)
+        pg.display.flip()
 
 
 # --- Exit
-S.exit(camera, pg)
+#S.exit(camera, pg)
+S.exit(pg)

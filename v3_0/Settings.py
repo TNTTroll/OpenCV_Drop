@@ -7,14 +7,16 @@ from time import time
 
 import Params as P
 import Additional as A
-from v3_0.IMVApi import *
+from IMVApi import *
 
 
 # --- Defs
-# <<< Program
+# <<< PROGRAM
 def setScreen():
     P.screen = pg.display.set_mode((P.WIDTH, P.HEIGHT))
     P.manager = pygame_gui.UIManager((P.WIDTH, P.HEIGHT))
+
+    A.addText("DropCV", (P.WIDTH // 2 - 100, 40), size=80, duration=-1)
 
     # Record
     P.buttons[0] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH*.15, 150), (P.WIDTH*.7, P.HEIGHT*.15)),
@@ -40,20 +42,34 @@ def setBG(lastTime):
         if P.orbs[i].drop(): P.orbs.pop(i)
         i += 1
 
-    A.setText("DropCV", (P.WIDTH//2-100, 40), size=80)
+    A.setText()
 
     return now
 
-def exit(camera, program):
-    closeCamera(camera)
+def exit(program):
+    #closeCamera(camera)
 
     program.quit()
     cv2.destroyAllWindows()
     cv2.waitKey(10)
 
-    print("\n\n\033[1;35mProgram has been closed")
+    print(f"\n\n\033[{P.fpsColor['purple']}mProgram has been closed")
 
-# <<< Camera
+def updating(set):
+    P.screen.fill(P.colors['black'])
+
+    font = pg.font.SysFont(None, 50)
+    showText = font.render("RECORDING", True, P.colors['text'])
+    P.screen.blit(showText, (P.WIDTH*.16, P.HEIGHT*.4))
+    showText = font.render("(maybe)", True, P.colors['text'])
+    P.screen.blit(showText, (P.WIDTH * .28, P.HEIGHT*.6))
+
+    pg.display.flip()
+
+    P.isUpdate = set
+
+
+# <<< CAMERA
 def getCamera():
     deviceList = IMV_DeviceList()
     interfaceType = IMV_EInterfaceType.interfaceTypeAll
@@ -64,6 +80,8 @@ def getCamera():
     camera.IMV_CreateHandle(IMV_ECreateHandleMode.modeByIndex, byref(c_void_p(0)))
     camera.IMV_Open()
     camera.IMV_StartGrabbing()
+
+    print(f"\n\n\033[{P.fpsColor['camera']}mStart the recording")
 
     return camera
 
@@ -91,3 +109,27 @@ def closeCamera(camera):
     camera.IMV_StopGrabbing()
     camera.IMV_Close()
     if camera.handle: camera.IMV_DestroyHandle()
+
+    print(f"\n\n\033[{P.fpsColor['camera']}mStop the recording")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

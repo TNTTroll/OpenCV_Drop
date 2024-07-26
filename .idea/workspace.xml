@@ -5,16 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ac5af6fb-780d-434c-a0eb-0f07d7c464dc" name="Changes" comment="Queue">
-      <change afterPath="$PROJECT_DIR$/v3_0/Additional.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v3_0/IMVApi.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v3_0/IMVDefines.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v3_0/Main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v3_0/Params.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v3_0/Settings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/v3_0/Modes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PlayGround.py" beforeDir="false" afterPath="$PROJECT_DIR$/PlayGround.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/v2_0/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/v2_0/Main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/v2_0/Vault.py" beforeDir="false" afterPath="$PROJECT_DIR$/v2_0/Vault.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v3_0/Additional.py" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/Additional.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v3_0/IMVApi.py" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/IMVApi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v3_0/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v3_0/Params.py" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/Params.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v3_0/Settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/Settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,9 +85,9 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "ToolWindowRun.ShowToolbar": "false",
-    "git-widget-placeholder": "v3.0",
-    "last_opened_file_path": "C:/Users/Spectre/PycharmProjects/OpenDrop/v3_0",
-    "settings.editor.selected.configurable": "vcs.Git"
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/Zver/PycharmProjects/OpenCV_Drop/v3_0",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -110,7 +107,6 @@
   <component name="RunManager" selected="Python.V3.0">
     <configuration name="V1.0" type="PythonConfigurationType" factoryName="Python">
       <module name="OpenDrop" />
-      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -133,7 +129,6 @@
     </configuration>
     <configuration name="V2.0" type="PythonConfigurationType" factoryName="Python">
       <module name="OpenDrop" />
-      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -156,15 +151,14 @@
     </configuration>
     <configuration name="V3.0" type="PythonConfigurationType" factoryName="Python">
       <module name="OpenDrop" />
-      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Users\Zver\AppData\Local\Programs\Python\Python311\python.exe" />
       <option name="SDK_NAME" value="Python 3.11" />
-      <option name="WORKING_DIRECTORY" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/v3_0" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />

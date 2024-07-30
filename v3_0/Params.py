@@ -12,6 +12,7 @@ WIDTH = 300
 HEIGHT = 500
 
 isUpdate = True
+isExtra = False
 
 # CAMERA
 cameraSize = [1920, 1200]        		# Camera size
@@ -57,6 +58,6 @@ fpsColor = {"white": "1",
 queueLimit = 500
 queue = Queue(maxsize=queueLimit)
 
-matrix  = np.zeros((queueLimit, cameraSize[1], cameraSize[0]), np.uint8)
+matrix = np.zeros((queueLimit, cameraSize[1], cameraSize[0]), np.uint8)
 
 queueFileCounter = 0

@@ -1,6 +1,9 @@
 # --- Imports
+import cv2
 import pygame as pg
 from time import time
+import requests
+from bs4 import BeautifulSoup
 
 import Params as P
 
@@ -23,6 +26,23 @@ def setText():
         if text.duration > 0: text.duration -= 1
         if text.duration == 0: P.texts.pop(i)
         i += 1
+
+def setTextCv(frame, text, pos, color=(240, 240, 240), size=1):
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    org = (pos[0], pos[1])
+    thickness = 2
+    outline = [(255 - x) for x in color]
+
+    cv2.putText(frame, str(text), org, font,
+                size, outline, thickness + 2, cv2.LINE_AA)
+    cv2.putText(frame, str(text), org, font,
+                size, color, thickness, cv2.LINE_AA)
+
+def getText():
+    resp = requests.get("https://anekdoty.ru/")
+    soup = BeautifulSoup(resp.text, "lxml")
+    ds = soup.findAll('ul', class_='item-list')[0].next('p')[0].text
+    return str(ds).replace("-", "\n-").replace(". ", "\n.")
 
 
 # --- Classes

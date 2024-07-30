@@ -46,28 +46,29 @@ def setBG(lastTime):
 
     return now
 
-def exit(program):
-    #closeCamera(camera)
+def exit(camera, program):
+    if camera != None:
+        closeCamera(camera)
 
     program.quit()
     cv2.destroyAllWindows()
     cv2.waitKey(10)
 
-    print(f"\n\n\033[{P.fpsColor['purple']}mProgram has been closed")
+    print(f"\n\n\033[{P.fpsColor['purple']}mProgram has been closed\033[0m")
 
 def updating(set):
     P.screen.fill(P.colors['black'])
-
-    font = pg.font.SysFont(None, 50)
-    showText = font.render("RECORDING", True, P.colors['text'])
-    P.screen.blit(showText, (P.WIDTH*.16, P.HEIGHT*.4))
-    showText = font.render("(maybe)", True, P.colors['text'])
-    P.screen.blit(showText, (P.WIDTH * .28, P.HEIGHT*.6))
-
-    pg.display.flip()
-
     P.isUpdate = set
+    
+    if not set:
+        font = pg.font.SysFont(None, 50)
+        showText = font.render("RECORDING", True, P.colors['text'])
+        P.screen.blit(showText, (P.WIDTH*.16, P.HEIGHT*.4))
+        showText = font.render("(maybe)", True, P.colors['text'])
+        P.screen.blit(showText, (P.WIDTH * .28, P.HEIGHT*.6))
+        pg.display.flip()
 
+        if P.isExtra: print(f"\n\033[{P.fpsColor['info']}m{A.getText()}\033[0m\n")
 
 # <<< CAMERA
 def getCamera():
@@ -81,9 +82,13 @@ def getCamera():
     camera.IMV_Open()
     camera.IMV_StartGrabbing()
 
-    print(f"\n\n\033[{P.fpsColor['camera']}mStart the recording")
-
-    return camera
+    if camera.IMV_GetFrame(IMV_Frame(), 1000) != 0:
+        A.addText("NO CAM", (P.WIDTH // 2 - 50, P.HEIGHT * .9))
+        print(f"\n\n\033[{P.fpsColor['camera']}mCamera not connected\033[0m")
+        return None
+    else:
+        print(f"\n\n\033[{P.fpsColor['camera']}mCamera was opened\033[0m")
+        return camera
 
 def getImage(camera):
     frame = IMV_Frame()
@@ -110,7 +115,7 @@ def closeCamera(camera):
     camera.IMV_Close()
     if camera.handle: camera.IMV_DestroyHandle()
 
-    print(f"\n\n\033[{P.fpsColor['camera']}mStop the recording")
+    print(f"\n\n\033[{P.fpsColor['camera']}mCamera was closed\033[0m")
 
 
 

@@ -16,7 +16,7 @@ pg.display.set_caption(P.windowName)
 clock = pg.time.Clock()
 
 S.setScreen()
-#camera = S.getCamera()
+camera = S.getCamera()
 
 
 # --- Camera
@@ -33,15 +33,20 @@ while isRunning:
             if event.key == pg.K_q:
                 isRunning = False
 
+            if event.key == pg.K_g:
+                P.isExtra = not P.isExtra
+
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == P.buttons[0]:  # Record
-                # M.startRecord(camera)
-                S.updating(False)
+                if camera == None:
+                    camera = S.getCamera()
+                if camera != None:
+                    M.startRecord(camera)
 
             if event.ui_element == P.buttons[1]:  # Replay
                 M.replay()
 
-            if event.ui_element == P.buttons[2]:  #Logging
+            if event.ui_element == P.buttons[2]:  # Logging
                 A.addText("IN DEV", (P.WIDTH//2-50, P.HEIGHT*.9))
 
         P.manager.process_events(event)
@@ -57,5 +62,4 @@ while isRunning:
 
 
 # --- Exit
-#S.exit(camera, pg)
-S.exit(pg)
+S.exit(camera, pg)

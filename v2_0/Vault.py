@@ -1842,3 +1842,128 @@ def afterbirth():
     if cam.handle: cam.IMV_DestroyHandle()
 
     print("CLOSED")
+
+def compare():
+    class circularlist(object):
+        def __init__(self, size, data=None):
+            if data is None: data = []
+            self.index = 0
+            self.size = size
+            self._data = list(data)[-size:]
+
+        def append(self, value):
+            if len(self._data) == self.size:
+                self._data[self.index] = value
+            else:
+                self._data.append(value)
+            self.index = (self.index + 1) % self.size
+
+        def __getitem__(self, key):
+            if len(self._data) == self.size:
+                return (self._data[(key + self.index) % self.size])
+            else:
+                try:
+                    return (self._data[key])
+                except(IndexError):
+                    return None
+
+    cq = circularlist(500)
+
+    def frameGrabbingProc(cam):
+        frame = IMV_Frame()
+
+        stPixelConvertParam = IMV_PixelConvertParam()
+        cam.IMV_GetFrame(frame, 1000)
+
+        nDstBufSize = frame.frameInfo.width * frame.frameInfo.height
+        pDstBuf = (c_ubyte * nDstBufSize)()
+        memset(byref(stPixelConvertParam), 0, sizeof(stPixelConvertParam))
+
+        stPixelConvertParam.nWidth = frame.frameInfo.width
+        stPixelConvertParam.nHeight = frame.frameInfo.height
+        stPixelConvertParam.nDstBufSize = nDstBufSize
+        stPixelConvertParam.pDstBuf = pDstBuf
+        stPixelConvertParam.pSrcData = frame.pData
+
+        cam.IMV_ReleaseFrame(frame)
+
+        imageBuff = stPixelConvertParam.pSrcData
+        userBuff = c_buffer(b'\0', stPixelConvertParam.nDstBufSize)
+        memmove(userBuff, imageBuff, stPixelConvertParam.nDstBufSize)
+
+        return userBuff
+
+    deviceList = IMV_DeviceList()
+    interfaceType = IMV_EInterfaceType.interfaceTypeAll
+
+    MvCamera.IMV_EnumDevices(deviceList, interfaceType)
+    cam = MvCamera()
+
+    cam.IMV_CreateHandle(IMV_ECreateHandleMode.modeByIndex, byref(c_void_p(0)))
+    cam.IMV_Open()
+    cam.IMV_StartGrabbing()
+
+    fps1 = FPS("SAVE", colors['purple'])
+    fps2 = FPS("NUMPY", colors['gray'])
+    fps3 = FPS("SHOW", colors['blue'])
+
+    def recording(s: Semaphore, limit, cq):
+        fps1.reset()
+        for i in range(limit):
+            frame = frameGrabbingProc(cam)
+            with s: cq.append(frame)
+
+            fps1.get()
+
+        return
+
+    def numpying(s: Semaphore, limit, arr, cq):
+        fps2.reset()
+        i = 0
+        while i < limit:
+            with s: byte = deepcopy(cq.__getitem__(i))
+            if byte != None:
+                frame = numpy.array(bytearray(byte)).reshape(1200, 1920)
+                arr[i] = frame
+                i += 1
+
+                fps2.get()
+
+        return
+
+    def showing(limit, arr):
+        fps3.reset()
+        for i in range(limit):
+            frame = arr[i]
+
+            fps3.get()
+
+            cv2.imshow("COMPARE", frame)
+            if cv2.waitKey(1) == ord('q'):
+                return 1
+
+        cv2.destroyAllWindows()
+        cv2.waitKey(10)
+        return 0
+
+    limit = 500
+    arr = numpy.zeros((limit, 1200, 1920), numpy.uint8)
+    while True:
+        # Считывание с камеры и сохранение в Numpy массив двумя потоками
+        t1 = Thread(target=recording, args=(s, limit, cq,), daemon=True)
+        t2 = Thread(target=numpying, args=(s, limit, arr, cq,))
+
+        t1.start()
+        t2.start()
+
+        t2.join()
+
+        # Показ того, что записали
+        if showing(limit, arr): break
+
+
+    cam.IMV_StopGrabbing()
+    cam.IMV_Close()
+    if cam.handle: cam.IMV_DestroyHandle()
+
+    print("CLOSED")

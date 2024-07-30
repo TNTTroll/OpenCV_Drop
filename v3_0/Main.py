@@ -25,7 +25,6 @@ t = time()
 while isRunning:
 
     t = S.setBG(t)
-    frame = None
 
     # <<< CONTROL PANEL
     for event in pg.event.get():
@@ -33,8 +32,12 @@ while isRunning:
             if event.key == pg.K_q:
                 isRunning = False
 
-            if event.key == pg.K_g:
-                P.isExtra = not P.isExtra
+            if event.key == pg.K_g:  # Change 'extra' mode
+                print(f"\n\033[{P.fpsColor['info']}m{A.getText()}\033[0m\n")
+
+            if event.key == pg.K_m:  # Change measurement mode
+                P.measureMode = P.measureMode+1 if P.measureMode < len(P.measurement)-1 else 0
+                A.addText(f"{P.measurement[P.measureMode]}", (int(P.WIDTH*.3), int(P.HEIGHT*.9)))
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == P.buttons[0]:  # Record
@@ -46,8 +49,23 @@ while isRunning:
             if event.ui_element == P.buttons[1]:  # Replay
                 M.replay()
 
-            if event.ui_element == P.buttons[2]:  # Logging
-                A.addText("IN DEV", (P.WIDTH//2-50, P.HEIGHT*.9))
+            if event.ui_element == P.buttons[2]:  # Measure
+                if camera == None:
+                    camera = S.getCamera()
+                if camera != None:
+                    M.measure(camera)
+
+            if event.ui_element == P.buttons[3]:  # Chessboard
+                if camera == None:
+                    camera = S.getCamera()
+                if camera != None:
+                    M.modeChess(camera)
+
+            if event.ui_element == P.buttons[4]:  # Background
+                if camera == None:
+                    camera = S.getCamera()
+                if camera != None:
+                    A.getMedian(camera)
 
         P.manager.process_events(event)
 

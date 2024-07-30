@@ -2,10 +2,12 @@
 import cv2
 import pygame as pg
 from time import time
+import numpy as np
 import requests
 from bs4 import BeautifulSoup
 
 import Params as P
+import Settings as S
 
 
 # --- Defs
@@ -42,7 +44,30 @@ def getText():
     resp = requests.get("https://anekdoty.ru/")
     soup = BeautifulSoup(resp.text, "lxml")
     ds = soup.findAll('ul', class_='item-list')[0].next('p')[0].text
-    return str(ds).replace("-", "\n-").replace(". ", "\n.")
+    return str(ds).replace("-", "\n-").replace(". ", ".\n")
+
+# <<< Median
+def getMedian(camera):
+    P.medianFrames = []
+
+    while len(P.medianFrames) != P.medianLength:
+        frame = np.array(bytearray( S.getImage(camera) )).reshape(1200, 1920)
+
+        if len(P.medianFrames) < P.medianLength:
+            print(f"\n\033[{P.fpsColor['info']}mGathering frames: {int(len(P.medianFrames) / P.medianLength * 100)}%\033[0m")
+            try:
+                if frame == None: return
+            except(ValueError):
+                P.medianFrames.append(frame)
+
+    median = np.median(P.medianFrames, axis=0).astype(dtype=np.uint8)
+    cv2.imwrite(P.medianName, median)
+
+    cv2.imshow('New BG', median)
+    cv2.waitKey(0)
+
+    cv2.destroyAllWindows()
+    cv2.waitKey(10)
 
 
 # --- Classes

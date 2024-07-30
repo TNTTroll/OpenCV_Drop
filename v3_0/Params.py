@@ -9,10 +9,12 @@ screen = None
 manager = None
 
 WIDTH = 300
-HEIGHT = 500
+HEIGHT = 540
 
 isUpdate = True
-isExtra = False
+
+measureMode = 0
+measurement = ["Area", "Diagonal"]
 
 # CAMERA
 cameraSize = [1920, 1200]        		# Camera size
@@ -30,8 +32,9 @@ orbs = []
 
 buttons = ["Record",                    # Record new material from camera
            "Replay",                    # Watch all the videos from the folder
-           "Logging",                   # Process all the video from the folder
-           ]
+           "Measure",                   # Process all the video from the folder
+           "Chessboard",                # Get a chess size
+           "Background"]                # Gather new frames to BG
 
 texts = []
 
@@ -61,3 +64,15 @@ queue = Queue(maxsize=queueLimit)
 matrix = np.zeros((queueLimit, cameraSize[1], cameraSize[0]), np.uint8)
 
 queueFileCounter = 0
+
+medianName = "Median.jpg"
+
+# CHESSBOARD
+cellPX = pxSizeFrame = 0
+realSize = 5.93
+
+# BG
+medianLength = 50
+medianFrames = [x for x in range(medianLength)]
+
+medianName = "Median.jpg"

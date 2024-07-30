@@ -19,16 +19,24 @@ def setScreen():
     A.addText("DropCV", (P.WIDTH // 2 - 100, 40), size=80, duration=-1)
 
     # Record
-    P.buttons[0] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH*.15, 150), (P.WIDTH*.7, P.HEIGHT*.15)),
+    P.buttons[0] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH*.15, 120), (P.WIDTH*.7, P.HEIGHT*.12)),
                                                 text=P.buttons[0], manager=P.manager)
 
     # Replay
-    P.buttons[1] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH*.15, 250), (P.WIDTH*.7, P.HEIGHT*.15)),
+    P.buttons[1] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH*.15, 190), (P.WIDTH*.7, P.HEIGHT*.12)),
                                                 text=P.buttons[1], manager=P.manager)
 
-    # Logging
-    P.buttons[2] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH*.15, 350), (P.WIDTH*.7, P.HEIGHT*.15)),
+    # Measure
+    P.buttons[2] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH*.15, 260), (P.WIDTH*.7, P.HEIGHT*.12)),
                                                 text=P.buttons[2], manager=P.manager)
+
+    # Chessboard
+    P.buttons[3] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH*.15, 330), (P.WIDTH*.7, P.HEIGHT*.12)),
+                                                text=P.buttons[3], manager=P.manager)
+
+    # Background
+    P.buttons[4] = pygame_gui.elements.UIButton(relative_rect=pg.Rect((P.WIDTH*.15, 400), (P.WIDTH*.7, P.HEIGHT*.12)),
+                                                text=P.buttons[4], manager=P.manager)
 
 def setBG(lastTime):
     P.screen.fill(P.colors['BG'])
@@ -67,8 +75,6 @@ def updating(set):
         showText = font.render("(maybe)", True, P.colors['text'])
         P.screen.blit(showText, (P.WIDTH * .28, P.HEIGHT*.6))
         pg.display.flip()
-
-        if P.isExtra: print(f"\n\033[{P.fpsColor['info']}m{A.getText()}\033[0m\n")
 
 # <<< CAMERA
 def getCamera():

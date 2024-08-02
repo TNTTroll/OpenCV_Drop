@@ -19,10 +19,10 @@ pg.display.set_caption(P.WINDOW_CAM)
 clock = pg.time.Clock()
 
 S.setScreen()
-L.calibrationCreateFirst()
+#L.calibrationCreateFirst()
 
-P.threadCount = int( len([f for f in listdir(P.logFolder) if not f.count(".") and
-                 not f.count(P.calibrationFolder[:-1])]) )
+#P.threadCount = int( len([f for f in listdir(P.logFolder) if not f.count(".") and
+#                 not f.count(P.calibrationFolder[:-1])]) )
 
 
 # --- Camera

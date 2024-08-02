@@ -44,7 +44,7 @@ def setBG(lastTime):
     now = lastTime
     i = 0
     if time() - lastTime > .5:
-        P.orbs.append( A.Orb([float(randint(0, P.WIDTH)), 0]) )
+        P.orbs.append( A.Orb([float(randint(0, P.WIDTH)), 0], randint(5, 15)) )
         now = time()
     while i < len(P.orbs):
         if P.orbs[i].drop(): P.orbs.pop(i)
@@ -76,6 +76,16 @@ def updating(set):
         P.screen.blit(showText, (P.WIDTH * .28, P.HEIGHT*.6))
         pg.display.flip()
 
+def saving():
+    P.screen.fill(P.colors['black'])
+
+    font = pg.font.SysFont(None, 50)
+    showText = font.render("SAVING", True, P.colors['text'])
+    P.screen.blit(showText, (P.WIDTH * .30, P.HEIGHT * .4))
+    showText = font.render("(truly)", True, P.colors['text'])
+    P.screen.blit(showText, (P.WIDTH * .32, P.HEIGHT * .6))
+    pg.display.flip()
+
 # <<< CAMERA
 def getCamera():
     deviceList = IMV_DeviceList()
@@ -88,6 +98,13 @@ def getCamera():
     camera.IMV_Open()
     camera.IMV_StartGrabbing()
 
+    frame = IMV_Frame()
+    camera.IMV_GetFrame(frame, 1000)
+    if frame.frameInfo.width != 0:
+        P.cameraSize[0] = frame.frameInfo.width
+        P.cameraSize[1] = frame.frameInfo.height
+        print(f"\n\n\033[{P.fpsColor['info']}mCamera [{P.cameraSize[0]}:{P.cameraSize[1]}]\033[0m")
+
     if camera.IMV_GetFrame(IMV_Frame(), 1000) != 0:
         A.addText("NO CAM", (P.WIDTH // 2 - 50, P.HEIGHT * .9))
         print(f"\n\n\033[{P.fpsColor['camera']}mCamera not connected\033[0m")
@@ -95,6 +112,33 @@ def getCamera():
     else:
         print(f"\n\n\033[{P.fpsColor['camera']}mCamera was opened\033[0m")
         return camera
+
+def rotateImage(camera):
+    frame = IMV_Frame()
+    camera.IMV_GetFrame(frame, 500)
+
+    stRotateImageParam = IMV_RotateImageParam()
+    memset(byref(stRotateImageParam), 0, sizeof(stRotateImageParam))
+
+    stRotateImageParam.pSrcData = frame.pData
+    stRotateImageParam.nSrcDataLen = frame.frameInfo.width * frame.frameInfo.height
+    stRotateImageParam.ePixelFormat = frame.frameInfo.pixelFormat
+
+    nRotateBufSize = frame.frameInfo.width * frame.frameInfo.height
+
+    stRotateImageParam.nWidth = frame.frameInfo.width
+    stRotateImageParam.nHeight = frame.frameInfo.height
+    stRotateImageParam.eRotationAngle = 2
+    stRotateImageParam.pDstBuf = (c_ubyte * nRotateBufSize)()
+    stRotateImageParam.nDstBufSize = nRotateBufSize
+
+    camera.IMV_RotateImage(stRotateImageParam)
+    camera.IMV_ReleaseFrame(frame)
+
+    user_buff = (c_ubyte * stRotateImageParam.nDstBufSize)()
+    cdll.msvcrt.memcpy(byref(user_buff), stRotateImageParam.pDstBuf, stRotateImageParam.nDstBufSize)
+
+    return user_buff
 
 def getImage(camera):
     frame = IMV_Frame()

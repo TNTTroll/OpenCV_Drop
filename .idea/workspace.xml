@@ -4,18 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ac5af6fb-780d-434c-a0eb-0f07d7c464dc" name="Changes" comment="Record + Replay">
-      <change afterPath="$PROJECT_DIR$/v3_0/Logging.py" afterDir="false" />
+    <list default="true" id="ac5af6fb-780d-434c-a0eb-0f07d7c464dc" name="Changes" comment="Chess + BG">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PlayGround.py" beforeDir="false" afterPath="$PROJECT_DIR$/PlayGround.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v1_0/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/v1_0/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v2_0/3.png" beforeDir="false" afterPath="$PROJECT_DIR$/v2_0/3.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/v3_0/Additional.py" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/Additional.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v3_0/Logging.py" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/Logging.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/v3_0/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/Main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/v3_0/Modes.py" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/Modes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/v3_0/Params.py" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/Params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/v3_0/Settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/Settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/v3_0/save/0000.avi" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/save/0000.avi" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v3_0/save/0000.avi" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/v3_0/save/0001.avi" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/save/0001.avi" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/v3_0/save/0002.avi" beforeDir="false" afterPath="$PROJECT_DIR$/v3_0/save/0002.avi" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/v3_0/save/0002.avi" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -280,7 +282,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722326420810</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Chess + BG">
+      <option name="closed" value="true" />
+      <created>1722337561618</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1722337561618</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -307,6 +317,7 @@
     <MESSAGE value="Эверисинк" />
     <MESSAGE value="Queue" />
     <MESSAGE value="Record + Replay" />
-    <option name="LAST_COMMIT_MESSAGE" value="Record + Replay" />
+    <MESSAGE value="Chess + BG" />
+    <option name="LAST_COMMIT_MESSAGE" value="Chess + BG" />
   </component>
 </project>

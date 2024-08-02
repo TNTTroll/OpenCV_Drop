@@ -46,12 +46,29 @@ def getText():
     ds = soup.findAll('ul', class_='item-list')[0].next('p')[0].text
     return str(ds).replace("-", "\n-").replace(". ", ".\n")
 
+# <<< Mask
+def getMask(frame):
+    try:
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    except: pass
+
+    thresh = cv2.threshold(frame, P.maskLimit, 255, cv2.THRESH_BINARY_INV)[1]
+
+    im_floodfill = thresh.copy()
+    h, w = thresh.shape[:2]
+    mask = np.zeros((h + 2, w + 2), np.uint8)
+    cv2.floodFill(im_floodfill, mask, (0, 0), 255)
+    im_floodfill_inv = cv2.bitwise_not(im_floodfill)
+    im_out = im_floodfill_inv | thresh
+
+    return im_out
+
 # <<< Median
 def getMedian(camera):
     P.medianFrames = []
 
     while len(P.medianFrames) != P.medianLength:
-        frame = np.array(bytearray( S.getImage(camera) )).reshape(1200, 1920)
+        frame = np.array(bytearray( S.rotateImage(camera) )).reshape(P.cameraSize[0], P.cameraSize[1])
 
         if len(P.medianFrames) < P.medianLength:
             print(f"\n\033[{P.fpsColor['info']}mGathering frames: {int(len(P.medianFrames) / P.medianLength * 100)}%\033[0m")
@@ -105,12 +122,13 @@ class FPS:
 
 
 class Orb:
-    def __init__(self, _pos):
+    def __init__(self, _pos, _radius):
         self.pos = _pos
+        self.radius = _radius
 
     def drop(self):
         if self.pos[1] < P.HEIGHT:
             self.pos[1] += 2
-            pg.draw.circle(P.screen, P.colors['orb'], self.pos, 10)
+            pg.draw.circle(P.screen, P.colors['orb'], self.pos, self.radius)
             return 0
         return 1

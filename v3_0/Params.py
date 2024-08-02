@@ -1,6 +1,8 @@
 # --- Imports
 from queue import Queue
 import numpy as np
+from os import listdir
+from pathlib import Path
 
 
 # --- Variables
@@ -13,8 +15,11 @@ HEIGHT = 540
 
 isUpdate = True
 
+recordMode = 0
+recording = ["Single", "Infinity"]
+
 measureMode = 0
-measurement = ["Area", "Diagonal"]
+measurement = ["Area", "Diagonal", "Fitting"]
 
 # CAMERA
 cameraSize = [1920, 1200]        		# Camera size
@@ -27,12 +32,14 @@ height = int(cameraSize[1] * coefficient)
 windowName = "DropCV" 		            # Name for Camera window
 FPS = 160.0                             # FPS
 
+maskLimit = 75
+
 # UI
 orbs = []
 
 buttons = ["Record",                    # Record new material from camera
            "Replay",                    # Watch all the videos from the folder
-           "Measure",                   # Process all the video from the folder
+           "Logging",                   # Process all the video from the folder and log them
            "Chessboard",                # Get a chess size
            "Background"]                # Gather new frames to BG
 
@@ -58,18 +65,19 @@ fpsColor = {"white": "1",
             }
 
 # QUEUE
-queueLimit = 500
+queueLimit = 300
 queue = Queue(maxsize=queueLimit)
 
 matrix = np.zeros((queueLimit, cameraSize[1], cameraSize[0]), np.uint8)
 
-queueFileCounter = 0
+path = str(Path().absolute()) + "\\save"
+queueFileCounter = len([f for f in listdir(path) if f.count(".")])
 
 medianName = "Median.jpg"
 
 # CHESSBOARD
 cellPX = pxSizeFrame = 0
-realSize = 5.93
+realSize = 2.5 * 6
 
 # BG
 medianLength = 50
